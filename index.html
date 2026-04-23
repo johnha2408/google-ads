@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232563eb'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='56' font-weight='700' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
-<title>RSA Builder Pro v6 — Fixed validation + inline Chart.js</title>
+<title>RSA Builder Pro v7 — Strategy Planner + Mindmap</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -210,6 +210,7 @@ tailwind.config = {
           <div id="topBreadcrumb" class="text-sm text-gray-500">Chưa chọn campaign</div>
         </div>
         <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+          <div class="nav-tab" data-view="mindmap" onclick="switchView('mindmap')">🧠 Mindmap</div>
           <div class="nav-tab active" data-view="creative" onclick="switchView('creative')">🎨 Creative</div>
           <div class="nav-tab" data-view="extensions" onclick="switchView('extensions')">🔗 Extensions</div>
           <div class="nav-tab" data-view="tracking" onclick="switchView('tracking')">📊 Tracking</div>
@@ -626,7 +627,188 @@ tailwind.config = {
   </main>
 </div>
 
-      <!-- ============ ANALYTICS VIEW ============ -->
+      <!-- ============ MINDMAP VIEW ============ -->
+      <div id="view-mindmap" class="p-6 hidden">
+        <div class="max-w-7xl mx-auto">
+
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-lg font-semibold">🧠 Campaign Strategy Planner</h2>
+              <p class="text-xs text-gray-500 mt-0.5">AI plan toàn bộ cấu trúc campaigns + ad groups theo funnel từ brief của bạn</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+            <!-- LEFT: Brief Input -->
+            <div class="lg:col-span-4">
+              <div class="card p-5">
+                <h3 class="font-semibold text-sm mb-3">📋 Project Brief</h3>
+
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Product / Service *</label>
+                    <textarea id="mmProduct" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Dịch vụ sản xuất video sự kiện cho doanh nghiệp tại Calgary. Quay tất cả các sự kiện từ conferences, launches, đến charity galas." oninput="saveMMBrief()"></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Business type *</label>
+                    <select id="mmBizType" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveMMBrief()">
+                      <option value="b2b-service">B2B Service</option>
+                      <option value="b2c-service">B2C Service</option>
+                      <option value="local-service">Local Service</option>
+                      <option value="ecommerce">E-commerce</option>
+                      <option value="saas">SaaS / Software</option>
+                      <option value="lead-gen">Lead Generation</option>
+                    </select>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Target location</label>
+                      <input type="text" id="mmLocation" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Calgary, Canada" oninput="saveMMBrief()">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Language</label>
+                      <select id="mmLang" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveMMBrief()">
+                        <option value="english">English</option>
+                        <option value="vietnamese">Tiếng Việt</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Monthly budget ($)</label>
+                      <input type="number" id="mmBudget" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="3000" oninput="saveMMBrief()">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Timeline</label>
+                      <select id="mmTimeline" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveMMBrief()">
+                        <option value="1m">1 tháng (test)</option>
+                        <option value="3m" selected>3 tháng</option>
+                        <option value="6m">6 tháng</option>
+                        <option value="12m">12 tháng (always-on)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Primary goal</label>
+                    <select id="mmGoal" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveMMBrief()">
+                      <option value="awareness">Brand Awareness</option>
+                      <option value="leads" selected>Lead Generation</option>
+                      <option value="sales">Sales/Conversions</option>
+                      <option value="retention">Retention/Repeat</option>
+                      <option value="full-funnel">Full Funnel (Awr → Cnv)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Competitors / Differentiators</label>
+                    <textarea id="mmCompetitors" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Competitor X có giá rẻ nhưng chất lượng thấp. Chúng tôi focus premium, fast delivery 2h." oninput="saveMMBrief()"></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Customer insights (optional)</label>
+                    <textarea id="mmInsights" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: 70% khách thuê cuối tuần. Thường search sau 8pm. Pain point: lo lắng về timeline." oninput="saveMMBrief()"></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Seasonality / Special notes</label>
+                    <input type="text" id="mmSeasonality" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Peak Q4, slow Q1, promo Black Friday" oninput="saveMMBrief()">
+                  </div>
+
+                  <div class="border-t border-gray-100 pt-3">
+                    <div class="flex items-center gap-2 mb-2">
+                      <input type="checkbox" id="mmIncludeAB" class="w-4 h-4 rounded" checked>
+                      <label for="mmIncludeAB" class="text-xs text-gray-700">Include A/B test variants (mỗi theme có 2-3 variants)</label>
+                    </div>
+                  </div>
+
+                  <button onclick="generateMindmap()" id="mmGenBtn" class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 text-sm font-medium flex items-center justify-center gap-2">
+                    <span>🧠 Generate Strategy với AI</span>
+                  </button>
+
+                  <div class="text-[10px] text-gray-500 text-center">AI sẽ mất 15-30s để plan toàn bộ</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Output -->
+            <div class="lg:col-span-8">
+              <div id="mmEmpty" class="card p-12 text-center">
+                <div class="text-5xl mb-3">🧠</div>
+                <div class="text-sm font-medium text-gray-900 mb-2">Chưa có strategy</div>
+                <div class="text-xs text-gray-500 max-w-md mx-auto">Điền brief bên trái và click Generate. AI sẽ đề xuất full campaign architecture — cấu trúc funnel, naming convention, keywords, budget split và A/B variants.</div>
+              </div>
+
+              <div id="mmOutput" class="hidden">
+
+                <!-- Summary card -->
+                <div class="card p-5 mb-4 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-sm">📊 Strategy Summary</h3>
+                    <div class="flex items-center gap-2">
+                      <button onclick="generateMindmap()" class="copy-btn">🔄 Regenerate</button>
+                      <button onclick="exportMindmapMD()" class="copy-btn">📥 Export MD</button>
+                    </div>
+                  </div>
+                  <div id="mmSummary" class="text-sm text-gray-700 leading-relaxed"></div>
+
+                  <div class="grid grid-cols-4 gap-3 mt-3">
+                    <div class="bg-white rounded-lg p-2 text-center">
+                      <div class="text-[10px] uppercase text-gray-500">Campaigns</div>
+                      <div id="mmCampCount" class="text-xl font-bold text-gray-900">—</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-2 text-center">
+                      <div class="text-[10px] uppercase text-gray-500">Ad Groups</div>
+                      <div id="mmAgCount" class="text-xl font-bold text-gray-900">—</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-2 text-center">
+                      <div class="text-[10px] uppercase text-gray-500">Keywords</div>
+                      <div id="mmKwCount" class="text-xl font-bold text-gray-900">—</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-2 text-center">
+                      <div class="text-[10px] uppercase text-gray-500">Budget/mo</div>
+                      <div id="mmBudgetTotal" class="text-xl font-bold text-gray-900">—</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View toggle + Actions -->
+                <div class="card p-3 mb-4 flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-xs">
+                    <button onclick="setMMView('mindmap')" id="mmViewMindmap" class="px-3 py-1.5 rounded-md font-medium bg-white shadow-sm">🗺 Mindmap</button>
+                    <button onclick="setMMView('tree')" id="mmViewTree" class="px-3 py-1.5 rounded-md font-medium text-gray-600">🌳 Tree view</button>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button onclick="reviewBeforeCreate()" class="px-3 py-1.5 bg-amber-100 text-amber-900 rounded-lg text-xs font-medium hover:bg-amber-200">✏️ Review & Edit</button>
+                    <button onclick="approveAndCreate(false)" class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700">✓ Approve & Create</button>
+                    <button onclick="approveAndCreate(true)" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">⚡ Create + Auto-gen RSAs</button>
+                  </div>
+                </div>
+
+                <!-- Mindmap view -->
+                <div id="mmMindmapView" class="card p-5 mb-4 overflow-x-auto">
+                  <div id="mmMindmapContainer" style="min-width: 900px;"></div>
+                </div>
+
+                <!-- Tree view -->
+                <div id="mmTreeView" class="card p-5 mb-4 hidden">
+                  <div id="mmTreeContainer"></div>
+                </div>
+
+                <!-- Details cards -->
+                <div id="mmDetails" class="space-y-3"></div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       <div id="view-analytics" class="p-6 hidden">
         <div class="max-w-7xl mx-auto">
 
@@ -815,6 +997,25 @@ tailwind.config = {
         </div>
       </div>
 
+
+<!-- Mindmap Review Modal -->
+<div id="mmReviewModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
+  <div class="bg-white rounded-xl p-5 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="font-semibold text-lg">✏️ Review & Edit trước khi tạo</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Đổi tên, bỏ chọn các ad groups không cần, rồi tạo</p>
+      </div>
+      <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+    <div id="mmReviewContent"></div>
+    <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 mt-4">
+      <button onclick="closeReviewModal()" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm">Hủy</button>
+      <button onclick="approveReviewAndCreate(false)" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium">✓ Tạo campaigns</button>
+      <button onclick="approveReviewAndCreate(true)" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">⚡ Tạo + Auto-gen RSAs</button>
+    </div>
+  </div>
+</div>
 
 <!-- Quick Paste Modal -->
 <div id="quickPasteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
@@ -1567,13 +1768,14 @@ function showCampaignView() {
 function switchView(v) {
   STATE.currentView = v;
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-  ['creative','extensions','tracking','preview','analytics'].forEach(x => {
+  ['creative','extensions','tracking','preview','analytics','mindmap'].forEach(x => {
     document.getElementById('view-'+x).classList.toggle('hidden', x !== v);
   });
   if (v === 'preview') renderPreview();
   if (v === 'tracking') rebuildUTM();
   if (v === 'extensions') renderExtensions();
   if (v === 'analytics') renderAnalytics();
+  if (v === 'mindmap') loadMMBrief();
 }
 
 // ============ HEADLINES / DESCRIPTIONS ============
@@ -3704,6 +3906,716 @@ Giữ tổng độ dài dưới 500 từ. Dùng emoji hợp lý. Concrete và sp
   }
 }
 
+// ============ MINDMAP / STRATEGY PLANNER ============
+let MM_CURRENT_STRATEGY = null; // The generated strategy object
+let MM_VIEW = 'mindmap'; // 'mindmap' or 'tree'
+
+function saveMMBrief() {
+  const brief = {
+    product: document.getElementById('mmProduct').value,
+    bizType: document.getElementById('mmBizType').value,
+    location: document.getElementById('mmLocation').value,
+    lang: document.getElementById('mmLang').value,
+    budget: document.getElementById('mmBudget').value,
+    timeline: document.getElementById('mmTimeline').value,
+    goal: document.getElementById('mmGoal').value,
+    competitors: document.getElementById('mmCompetitors').value,
+    insights: document.getElementById('mmInsights').value,
+    seasonality: document.getElementById('mmSeasonality').value,
+    includeAB: document.getElementById('mmIncludeAB').checked
+  };
+  localStorage.setItem('rsa2_mm_brief', JSON.stringify(brief));
+}
+
+function loadMMBrief() {
+  const saved = localStorage.getItem('rsa2_mm_brief');
+  if (!saved) return;
+  try {
+    const b = JSON.parse(saved);
+    document.getElementById('mmProduct').value = b.product || '';
+    document.getElementById('mmBizType').value = b.bizType || 'b2b-service';
+    document.getElementById('mmLocation').value = b.location || '';
+    document.getElementById('mmLang').value = b.lang || 'english';
+    document.getElementById('mmBudget').value = b.budget || '';
+    document.getElementById('mmTimeline').value = b.timeline || '3m';
+    document.getElementById('mmGoal').value = b.goal || 'leads';
+    document.getElementById('mmCompetitors').value = b.competitors || '';
+    document.getElementById('mmInsights').value = b.insights || '';
+    document.getElementById('mmSeasonality').value = b.seasonality || '';
+    document.getElementById('mmIncludeAB').checked = b.includeAB !== false;
+  } catch(e) {}
+
+  // Restore last strategy if any
+  const savedStrategy = localStorage.getItem('rsa2_mm_strategy');
+  if (savedStrategy) {
+    try {
+      MM_CURRENT_STRATEGY = JSON.parse(savedStrategy);
+      renderMindmapOutput();
+    } catch(e) {}
+  }
+}
+
+async function generateMindmap() {
+  if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
+  const product = document.getElementById('mmProduct').value.trim();
+  if (!product) { toast('⚠ Điền Product/Service trước'); return; }
+
+  const btn = document.getElementById('mmGenBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> AI đang plan strategy...';
+
+  try {
+    const brief = {
+      product,
+      bizType: document.getElementById('mmBizType').value,
+      location: document.getElementById('mmLocation').value.trim() || 'unspecified',
+      lang: document.getElementById('mmLang').value,
+      budget: parseFloat(document.getElementById('mmBudget').value) || 3000,
+      timeline: document.getElementById('mmTimeline').value,
+      goal: document.getElementById('mmGoal').value,
+      competitors: document.getElementById('mmCompetitors').value.trim(),
+      insights: document.getElementById('mmInsights').value.trim(),
+      seasonality: document.getElementById('mmSeasonality').value.trim(),
+      includeAB: document.getElementById('mmIncludeAB').checked
+    };
+
+    const prompt = buildMindmapPrompt(brief);
+    const resp = await callAI(prompt);
+    const parsed = parseJSONResponse(resp);
+
+    if (!parsed || !parsed.campaigns) throw new Error('AI response không hợp lệ. Thử regenerate.');
+
+    // Sanitize & validate structure
+    MM_CURRENT_STRATEGY = {
+      summary: parsed.summary || 'Strategy generated',
+      recommendations: parsed.recommendations || [],
+      campaigns: (parsed.campaigns || []).map(c => ({
+        name: c.name || 'Untitled',
+        type: c.type || 'Search',
+        goal: c.goal || 'general',
+        budget: parseFloat(c.budget) || 0,
+        targeting: c.targeting || {},
+        adGroups: (c.adGroups || c.ad_groups || []).map(ag => ({
+          name: ag.name || 'Untitled',
+          funnel: ag.funnel || 'Consideration',
+          theme: ag.theme || '',
+          intent: ag.intent || '',
+          matchType: ag.matchType || ag.match_type || 'Phrase',
+          keywords: Array.isArray(ag.keywords) ? ag.keywords : [],
+          budget: parseFloat(ag.budget) || 0,
+          variant: ag.variant || null,
+          variantOf: ag.variantOf || ag.variant_of || null,
+          messaging: ag.messaging || '',
+          negativeKeywords: ag.negativeKeywords || ag.negative_keywords || []
+        }))
+      }))
+    };
+
+    localStorage.setItem('rsa2_mm_strategy', JSON.stringify(MM_CURRENT_STRATEGY));
+    renderMindmapOutput();
+    toast(`✓ Strategy: ${MM_CURRENT_STRATEGY.campaigns.length} campaigns, ${MM_CURRENT_STRATEGY.campaigns.reduce((s,c)=>s+c.adGroups.length,0)} ad groups`);
+  } catch(e) {
+    console.error(e);
+    toast('✗ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>🧠 Generate Strategy với AI</span>';
+  }
+}
+
+function buildMindmapPrompt(brief) {
+  const langHint = brief.lang === 'vietnamese'
+    ? 'Tên campaign/ad group dùng English (để dễ import Google Ads), nhưng "messaging" và "summary" viết bằng tiếng Việt.'
+    : 'All output in English.';
+
+  const goalDesc = {
+    'awareness': 'Brand Awareness — focus upper funnel, generic/category keywords, broad reach',
+    'leads': 'Lead Generation — balance awareness + consideration, focus on forms/quotes/inquiries',
+    'sales': 'Direct Sales/Conversions — focus bottom funnel, high-intent keywords, transactional',
+    'retention': 'Retention/Repeat customers — remarketing, brand, retention keywords',
+    'full-funnel': 'Full Funnel — Awareness + Consideration + Conversion split'
+  }[brief.goal];
+
+  const abInstr = brief.includeAB
+    ? `- INCLUDE A/B TEST VARIANTS: for each high-priority ad group, create 2-3 variants with DIFFERENT messaging angles (e.g., Benefit vs Urgency vs Social-Proof). Mark variants by adding "variant" field (A/B/C) and "variantOf" pointing to parent theme name.`
+    : `- Single ad group per theme, no variants.`;
+
+  return `You are a senior Google Ads strategist. Design a complete campaign architecture.
+
+BRIEF:
+- Product/Service: ${brief.product}
+- Business type: ${brief.bizType}
+- Target location: ${brief.location}
+- Monthly budget: $${brief.budget}
+- Timeline: ${brief.timeline}
+- Primary goal: ${goalDesc}
+- Competitors/Differentiators: ${brief.competitors || 'none specified'}
+- Customer insights: ${brief.insights || 'none specified'}
+- Seasonality: ${brief.seasonality || 'none specified'}
+
+REQUIREMENTS:
+1. Design 1-3 campaigns based on budget and goal (smaller budget = fewer campaigns)
+2. Each campaign has 3-8 ad groups
+3. Follow funnel stages: Awareness (AWR) → Consideration (CON) → Conversion (CNV)
+4. Use this NAMING CONVENTION strictly:
+   - Campaign: "Search_[Location]_[MainTheme]_[FunnelScope]"
+     Example: "Search_Calgary_ReadyMix_FullFunnel"
+   - Ad Group: "[FUNNEL]_[Intent]_[Theme]" (or with "_VarA/B/C" suffix for variants)
+     Examples: "AWR_Generic_ReadyMix", "CON_Compare_Concrete", "CNV_Brand_Omega", "CNV_Location_CalgaryDelivery_VarA"
+5. Budget split by funnel stage intelligently based on goal:
+   - Awareness goal: 60% AWR / 30% CON / 10% CNV
+   - Leads goal: 20% AWR / 40% CON / 40% CNV
+   - Sales goal: 10% AWR / 30% CON / 60% CNV
+   - Retention: 5% AWR / 25% CON / 70% CNV
+   - Full-funnel: 30% / 40% / 30%
+6. For each ad group provide:
+   - 5-10 keyword suggestions (mix match types — note which)
+   - Match type recommendation (Exact/Phrase/Broad)
+   - Budget ($/month)
+   - Messaging angle (1-2 sentences)
+   - 3-5 negative keywords to exclude
+${abInstr}
+7. ${langHint}
+
+OUTPUT: Valid JSON only, no markdown:
+{
+  "summary": "2-3 sentence executive summary of strategy approach",
+  "recommendations": ["Key strategic rec 1", "Key strategic rec 2", "Key strategic rec 3"],
+  "campaigns": [
+    {
+      "name": "Search_Calgary_ReadyMix_FullFunnel",
+      "type": "Search",
+      "goal": "Lead Generation",
+      "budget": 3000,
+      "targeting": {
+        "location": "Calgary + 50km radius",
+        "language": "English",
+        "device": "All",
+        "schedule": "Mon-Fri 7am-6pm priority",
+        "audiences": ["In-market: Construction Services", "Custom: competitor visitors"]
+      },
+      "adGroups": [
+        {
+          "name": "AWR_Generic_ReadyMix",
+          "funnel": "Awareness",
+          "theme": "Generic category research",
+          "intent": "Informational",
+          "matchType": "Broad",
+          "keywords": ["ready mix concrete", "what is ready mix", "concrete delivery options"],
+          "budget": 300,
+          "messaging": "Educate on ready mix benefits vs alternatives",
+          "negativeKeywords": ["free", "diy", "job"]
+        },
+        {
+          "name": "CNV_Brand_Omega_VarA",
+          "funnel": "Conversion",
+          "theme": "Brand search",
+          "intent": "Transactional",
+          "matchType": "Exact",
+          "keywords": ["omega ready mix", "omega concrete calgary"],
+          "budget": 200,
+          "variant": "A",
+          "variantOf": "CNV_Brand_Omega",
+          "messaging": "Benefit-focused: 20+ years experience, same-day delivery",
+          "negativeKeywords": ["jobs", "careers"]
+        }
+      ]
+    }
+  ]
+}`;
+}
+
+function setMMView(v) {
+  MM_VIEW = v;
+  document.getElementById('mmViewMindmap').className = v === 'mindmap' ? 'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm' : 'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  document.getElementById('mmViewTree').className = v === 'tree' ? 'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm' : 'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  document.getElementById('mmMindmapView').classList.toggle('hidden', v !== 'mindmap');
+  document.getElementById('mmTreeView').classList.toggle('hidden', v !== 'tree');
+  if (v === 'mindmap') renderMindmapSVG();
+  else renderTreeView();
+}
+
+function renderMindmapOutput() {
+  if (!MM_CURRENT_STRATEGY) return;
+  document.getElementById('mmEmpty').classList.add('hidden');
+  document.getElementById('mmOutput').classList.remove('hidden');
+
+  const s = MM_CURRENT_STRATEGY;
+  document.getElementById('mmSummary').innerHTML = `
+    <div class="mb-2">${escapeHTML(s.summary)}</div>
+    ${s.recommendations.length > 0 ? `
+      <div class="mt-2 space-y-1">
+        ${s.recommendations.map(r => `<div class="flex items-start gap-1.5"><span class="text-blue-600">→</span><span class="text-xs">${escapeHTML(r)}</span></div>`).join('')}
+      </div>
+    ` : ''}
+  `;
+
+  const totalAG = s.campaigns.reduce((sum,c)=>sum+c.adGroups.length,0);
+  const totalKW = s.campaigns.reduce((sum,c)=>sum+c.adGroups.reduce((sm,ag)=>sm+ag.keywords.length,0),0);
+  const totalBudget = s.campaigns.reduce((sum,c)=>sum+c.budget,0);
+
+  document.getElementById('mmCampCount').textContent = s.campaigns.length;
+  document.getElementById('mmAgCount').textContent = totalAG;
+  document.getElementById('mmKwCount').textContent = totalKW;
+  document.getElementById('mmBudgetTotal').textContent = '$' + totalBudget.toLocaleString();
+
+  if (MM_VIEW === 'mindmap') renderMindmapSVG();
+  else renderTreeView();
+  renderMindmapDetails();
+}
+
+function funnelColor(funnel) {
+  const f = (funnel || '').toLowerCase();
+  if (f.includes('aware')) return { bg: '#dbeafe', border: '#3b82f6', text: '#1e3a8a', short: 'AWR' };
+  if (f.includes('consid')) return { bg: '#fef3c7', border: '#f59e0b', text: '#78350f', short: 'CON' };
+  if (f.includes('conv')) return { bg: '#dcfce7', border: '#16a34a', text: '#14532d', short: 'CNV' };
+  if (f.includes('reten')) return { bg: '#f3e8ff', border: '#a855f7', text: '#581c87', short: 'RET' };
+  return { bg: '#f3f4f6', border: '#6b7280', text: '#1f2937', short: 'GEN' };
+}
+
+function renderMindmapSVG() {
+  const s = MM_CURRENT_STRATEGY;
+  if (!s) return;
+  const container = document.getElementById('mmMindmapContainer');
+
+  // Layout calculation
+  const nodeW = 180, nodeH = 54, padX = 40, padY = 30;
+  const centerX = 450;
+
+  // For each campaign, list of ad groups grouped by funnel
+  let svgHeight = 100;
+  let campaignSections = [];
+
+  s.campaigns.forEach((camp, ci) => {
+    // Group ad groups by funnel
+    const grouped = { awareness: [], consideration: [], conversion: [], retention: [] };
+    camp.adGroups.forEach(ag => {
+      const f = (ag.funnel || '').toLowerCase();
+      if (f.includes('aware')) grouped.awareness.push(ag);
+      else if (f.includes('consid')) grouped.consideration.push(ag);
+      else if (f.includes('conv')) grouped.conversion.push(ag);
+      else if (f.includes('reten')) grouped.retention.push(ag);
+      else grouped.consideration.push(ag);
+    });
+    campaignSections.push({ campaign: camp, grouped });
+  });
+
+  // Calculate total height
+  campaignSections.forEach(section => {
+    const rowsPerFunnel = Object.values(section.grouped).map(arr => Math.ceil(arr.length / 3));
+    const maxRows = Math.max(...rowsPerFunnel, 1);
+    svgHeight += 100 + (maxRows * (nodeH + padY)) + 80;
+  });
+
+  let svg = `<svg viewBox="0 0 900 ${svgHeight}" style="width:100%;max-width:900px;height:auto;font-family:Inter,sans-serif">`;
+
+  let y = 40;
+  campaignSections.forEach((section, ci) => {
+    const camp = section.campaign;
+    const campY = y;
+
+    // Campaign node (top)
+    svg += `<rect x="${centerX - 140}" y="${campY}" width="280" height="48" rx="10" fill="#1e3a8a" stroke="#1e3a8a" stroke-width="2"/>`;
+    svg += `<text x="${centerX}" y="${campY + 20}" fill="white" font-size="11" font-weight="600" text-anchor="middle">${escapeHTML(camp.name.slice(0,36))}</text>`;
+    svg += `<text x="${centerX}" y="${campY + 36}" fill="#bfdbfe" font-size="10" text-anchor="middle">$${camp.budget}/mo · ${camp.adGroups.length} ad groups</text>`;
+
+    // Funnel column headers
+    const funnelY = campY + 90;
+    const funnels = [
+      { key: 'awareness', label: 'AWARENESS', x: 150, data: section.grouped.awareness },
+      { key: 'consideration', label: 'CONSIDERATION', x: 450, data: section.grouped.consideration },
+      { key: 'conversion', label: 'CONVERSION', x: 750, data: section.grouped.conversion }
+    ];
+    if (section.grouped.retention.length > 0) {
+      funnels.push({ key: 'retention', label: 'RETENTION', x: 750, data: section.grouped.retention });
+    }
+
+    funnels.forEach(f => {
+      const color = funnelColor(f.key);
+      // Column header
+      svg += `<rect x="${f.x - 80}" y="${funnelY}" width="160" height="28" rx="6" fill="${color.bg}" stroke="${color.border}" stroke-width="1"/>`;
+      svg += `<text x="${f.x}" y="${funnelY + 18}" fill="${color.text}" font-size="11" font-weight="600" text-anchor="middle">${f.label} (${f.data.length})</text>`;
+
+      // Line from campaign to funnel
+      svg += `<line x1="${centerX}" y1="${campY + 48}" x2="${f.x}" y2="${funnelY}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>`;
+
+      // Ad group boxes under each funnel
+      f.data.forEach((ag, idx) => {
+        const col = idx % 1; // 1 column per funnel for clarity
+        const row = idx;
+        const x = f.x - nodeW/2;
+        const yPos = funnelY + 50 + row * (nodeH + 12);
+        const isVariant = ag.variant;
+
+        // Line from funnel header to ad group
+        svg += `<line x1="${f.x}" y1="${funnelY + 28}" x2="${f.x}" y2="${yPos}" stroke="${color.border}" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>`;
+
+        svg += `<rect x="${x}" y="${yPos}" width="${nodeW}" height="${nodeH}" rx="8" fill="${color.bg}" stroke="${color.border}" stroke-width="1.5" ${isVariant ? 'stroke-dasharray="4,2"' : ''}/>`;
+        // Name
+        const shortName = ag.name.length > 26 ? ag.name.slice(0, 24) + '...' : ag.name;
+        svg += `<text x="${x + nodeW/2}" y="${yPos + 20}" fill="${color.text}" font-size="10" font-weight="600" text-anchor="middle">${escapeHTML(shortName)}</text>`;
+        // Meta
+        svg += `<text x="${x + nodeW/2}" y="${yPos + 36}" fill="${color.text}" font-size="9" text-anchor="middle" opacity="0.75">$${ag.budget}/mo · ${ag.keywords.length} kws · ${ag.matchType}</text>`;
+        // Variant badge
+        if (isVariant) {
+          svg += `<circle cx="${x + nodeW - 12}" cy="${yPos + 12}" r="8" fill="${color.border}"/>`;
+          svg += `<text x="${x + nodeW - 12}" y="${yPos + 15}" fill="white" font-size="9" font-weight="700" text-anchor="middle">${ag.variant}</text>`;
+        }
+      });
+    });
+
+    // Advance y
+    const maxRows = Math.max(...funnels.map(f => f.data.length), 1);
+    y = funnelY + 50 + maxRows * (nodeH + 12) + 50;
+  });
+
+  svg += '</svg>';
+
+  // Legend
+  svg = `<div class="flex items-center gap-3 mb-3 text-xs flex-wrap">
+    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#dbeafe;border:1px solid #3b82f6"></span>Awareness</span>
+    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#fef3c7;border:1px solid #f59e0b"></span>Consideration</span>
+    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#dcfce7;border:1px solid #16a34a"></span>Conversion</span>
+    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded border-dashed" style="background:#dcfce7;border:1px dashed #16a34a"></span>A/B Variant</span>
+  </div>` + svg;
+
+  container.innerHTML = svg;
+}
+
+function renderTreeView() {
+  const s = MM_CURRENT_STRATEGY;
+  if (!s) return;
+  const el = document.getElementById('mmTreeContainer');
+
+  let html = '';
+  s.campaigns.forEach((camp, ci) => {
+    html += `
+      <details open class="mb-3">
+        <summary class="cursor-pointer bg-blue-900 text-white px-3 py-2 rounded-lg font-medium text-sm flex items-center justify-between">
+          <span>📁 ${escapeHTML(camp.name)}</span>
+          <span class="text-xs opacity-80">$${camp.budget}/mo · ${camp.adGroups.length} ad groups</span>
+        </summary>
+        <div class="pl-4 mt-2 space-y-1">
+    `;
+
+    // Group by funnel
+    const grouped = { 'AWR': [], 'CON': [], 'CNV': [], 'RET': [] };
+    camp.adGroups.forEach(ag => {
+      const c = funnelColor(ag.funnel);
+      if (grouped[c.short]) grouped[c.short].push(ag);
+      else grouped['CON'].push(ag);
+    });
+
+    Object.entries(grouped).forEach(([stage, ags]) => {
+      if (ags.length === 0) return;
+      const c = funnelColor(stage === 'AWR' ? 'awareness' : stage === 'CON' ? 'consideration' : stage === 'CNV' ? 'conversion' : 'retention');
+      html += `
+        <details open class="ml-2">
+          <summary class="cursor-pointer px-2 py-1 rounded text-xs font-semibold" style="color:${c.text};background:${c.bg}">
+            📂 ${stage === 'AWR' ? 'AWARENESS' : stage === 'CON' ? 'CONSIDERATION' : stage === 'CNV' ? 'CONVERSION' : 'RETENTION'} (${ags.length})
+          </summary>
+          <div class="pl-4 mt-1 space-y-1">
+      `;
+      ags.forEach(ag => {
+        html += `
+          <details class="border border-gray-200 rounded-lg">
+            <summary class="cursor-pointer px-3 py-2 text-sm flex items-center justify-between hover:bg-gray-50">
+              <span class="flex items-center gap-2">
+                <span style="color:${c.border}">▸</span>
+                <span class="font-medium">${escapeHTML(ag.name)}</span>
+                ${ag.variant ? `<span class="chip" style="background:${c.bg};color:${c.text}">VAR ${ag.variant}</span>` : ''}
+              </span>
+              <span class="text-xs text-gray-500">$${ag.budget} · ${ag.keywords.length}kw · ${ag.matchType}</span>
+            </summary>
+            <div class="px-3 pb-2 pt-1 text-xs space-y-1.5 bg-gray-50">
+              <div><strong>Intent:</strong> ${escapeHTML(ag.intent || '—')}</div>
+              <div><strong>Messaging:</strong> ${escapeHTML(ag.messaging || '—')}</div>
+              <div><strong>Keywords:</strong><br>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  ${ag.keywords.map(k => `<span class="chip chip-info">${escapeHTML(k)}</span>`).join('')}
+                </div>
+              </div>
+              ${ag.negativeKeywords.length ? `
+                <div><strong>Negatives:</strong><br>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    ${ag.negativeKeywords.map(k => `<span class="chip chip-err">-${escapeHTML(k)}</span>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </details>
+        `;
+      });
+      html += `</div></details>`;
+    });
+
+    html += `</div></details>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function renderMindmapDetails() {
+  const s = MM_CURRENT_STRATEGY;
+  if (!s) return;
+  const el = document.getElementById('mmDetails');
+
+  let html = '';
+  s.campaigns.forEach(camp => {
+    const t = camp.targeting || {};
+    html += `
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h4 class="font-semibold text-sm">${escapeHTML(camp.name)}</h4>
+            <div class="text-xs text-gray-500 mt-0.5">${escapeHTML(camp.type)} · Goal: ${escapeHTML(camp.goal)} · $${camp.budget}/mo</div>
+          </div>
+        </div>
+
+        <!-- Targeting -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 text-xs">
+          ${t.location ? `<div class="bg-gray-50 rounded p-2"><div class="text-[10px] uppercase text-gray-500">Location</div><div>${escapeHTML(t.location)}</div></div>` : ''}
+          ${t.language ? `<div class="bg-gray-50 rounded p-2"><div class="text-[10px] uppercase text-gray-500">Language</div><div>${escapeHTML(t.language)}</div></div>` : ''}
+          ${t.device ? `<div class="bg-gray-50 rounded p-2"><div class="text-[10px] uppercase text-gray-500">Device</div><div>${escapeHTML(t.device)}</div></div>` : ''}
+          ${t.schedule ? `<div class="bg-gray-50 rounded p-2"><div class="text-[10px] uppercase text-gray-500">Schedule</div><div>${escapeHTML(t.schedule)}</div></div>` : ''}
+        </div>
+        ${Array.isArray(t.audiences) && t.audiences.length ? `
+          <div class="text-xs mb-3">
+            <span class="text-gray-500">Audiences:</span>
+            ${t.audiences.map(a => `<span class="chip chip-info ml-1">${escapeHTML(a)}</span>`).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+// ============ REVIEW & CREATE ============
+function reviewBeforeCreate() {
+  if (!MM_CURRENT_STRATEGY) return;
+  // Open modal with editable fields
+  const modal = document.getElementById('mmReviewModal');
+  modal.classList.remove('hidden');
+  renderReviewModal();
+}
+
+function renderReviewModal() {
+  const s = MM_CURRENT_STRATEGY;
+  if (!s) return;
+  let html = '';
+  s.campaigns.forEach((camp, ci) => {
+    html += `
+      <div class="border border-gray-200 rounded-lg p-3 mb-3">
+        <div class="mb-2">
+          <label class="block text-[10px] uppercase text-gray-500">Campaign name</label>
+          <input type="text" value="${escapeAttr(camp.name)}" onchange="MM_CURRENT_STRATEGY.campaigns[${ci}].name=this.value" class="w-full px-2 py-1 border border-gray-200 rounded text-sm font-mono">
+        </div>
+        <div class="space-y-1 pl-3 border-l-2 border-gray-200">
+          ${camp.adGroups.map((ag, ai) => `
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1">
+                <input type="checkbox" id="mm-ag-${ci}-${ai}" checked class="w-3.5 h-3.5">
+              </label>
+              <input type="text" value="${escapeAttr(ag.name)}" onchange="MM_CURRENT_STRATEGY.campaigns[${ci}].adGroups[${ai}].name=this.value" class="flex-1 px-2 py-1 border border-gray-200 rounded text-xs font-mono">
+              <span class="text-[10px] text-gray-500 w-20 text-right">$${ag.budget} · ${ag.keywords.length}kw</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('mmReviewContent').innerHTML = html;
+}
+
+function approveReviewAndCreate(autoGen) {
+  // Filter out unchecked ad groups
+  const s = JSON.parse(JSON.stringify(MM_CURRENT_STRATEGY));
+  s.campaigns.forEach((c, ci) => {
+    c.adGroups = c.adGroups.filter((ag, ai) => {
+      const cb = document.getElementById(`mm-ag-${ci}-${ai}`);
+      return cb ? cb.checked : true;
+    });
+  });
+  s.campaigns = s.campaigns.filter(c => c.adGroups.length > 0);
+
+  closeReviewModal();
+  createCampaignsFromStrategy(s, autoGen);
+}
+
+function closeReviewModal() {
+  document.getElementById('mmReviewModal').classList.add('hidden');
+}
+
+async function approveAndCreate(autoGen) {
+  if (!MM_CURRENT_STRATEGY) return;
+  const msg = autoGen
+    ? `Tạo ${MM_CURRENT_STRATEGY.campaigns.length} campaigns + AI generate RSA cho tất cả ad groups? (sẽ mất thời gian)`
+    : `Tạo ${MM_CURRENT_STRATEGY.campaigns.length} campaigns (chưa gen RSA)?`;
+  if (!confirm(msg)) return;
+  createCampaignsFromStrategy(MM_CURRENT_STRATEGY, autoGen);
+}
+
+async function createCampaignsFromStrategy(strategy, autoGen) {
+  let createdCount = 0;
+
+  for (const campData of strategy.campaigns) {
+    // Create new campaign
+    const campId = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const brief = JSON.parse(localStorage.getItem('rsa2_mm_brief') || '{}');
+    const newCamp = {
+      id: campId,
+      name: campData.name,
+      url: '',
+      utm: { source:'google', medium:'cpc', campaign:'{campaignname}', campaignCustom:'', content:'{adgroupname}', term:'{keyword}', extra:'' },
+      extensions: { sitelinks:[], callouts:[], snippets:[] },
+      adGroups: []
+    };
+
+    // Create ad groups
+    for (const agData of campData.adGroups) {
+      const agId = 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      newCamp.adGroups.push({
+        id: agId,
+        name: agData.name,
+        theme: agData.theme + (agData.messaging ? ` — ${agData.messaging}` : ''),
+        keywords: agData.keywords.join('\n'),
+        usp: agData.messaging || brief.product || '',
+        offer: '',
+        tone: agData.variant === 'A' ? 'professional' : agData.variant === 'B' ? 'urgent' : agData.variant === 'C' ? 'friendly' : 'professional',
+        lang: brief.lang || 'english',
+        url: '',
+        path1: '',
+        path2: '',
+        headlines: [],
+        descriptions: [],
+        extensions: { sitelinks:[], callouts:[], snippets:[], override: false },
+        _mindmapMeta: {
+          funnel: agData.funnel,
+          intent: agData.intent,
+          matchType: agData.matchType,
+          budget: agData.budget,
+          variant: agData.variant,
+          negativeKeywords: agData.negativeKeywords
+        }
+      });
+      await sleep(2); // Ensure unique IDs
+    }
+
+    STATE.campaigns.push(newCamp);
+    createdCount++;
+    await sleep(2);
+  }
+
+  saveData();
+  renderSidebar();
+  toast(`✓ Đã tạo ${createdCount} campaigns với ${strategy.campaigns.reduce((s,c)=>s+c.adGroups.length,0)} ad groups`);
+
+  // Switch to the first created campaign
+  if (createdCount > 0) {
+    const firstNew = STATE.campaigns[STATE.campaigns.length - createdCount];
+    loadCampaign(firstNew.id);
+    switchView('creative');
+  }
+
+  // Auto-gen RSAs if requested
+  if (autoGen) {
+    await sleep(500);
+    const newCamps = STATE.campaigns.slice(-createdCount);
+    toast(`⏳ Đang auto-gen RSA cho ${newCamps.reduce((s,c)=>s+c.adGroups.length,0)} ad groups...`);
+
+    for (const c of newCamps) {
+      for (const ag of c.adGroups) {
+        STATE.activeCampaignId = c.id;
+        STATE.activeAdGroupId = ag.id;
+        try {
+          await generateCreativeForAdGroup(ag);
+          renderSidebar();
+        } catch(e) {
+          console.error('Failed for', ag.name, e);
+        }
+        await sleep(1500); // Rate limit pause
+      }
+    }
+
+    loadCampaign(newCamps[0].id);
+    toast('✓ Auto-gen hoàn tất. Kiểm tra từng ad group.');
+  }
+}
+
+async function generateCreativeForAdGroup(ag) {
+  if (!ag.theme || !ag.usp) return;
+  const prompt = buildCreativePrompt(ag);
+  const resp = await callAI(prompt);
+  const parsed = parseJSONResponse(resp);
+  if (!parsed) return;
+  if (Array.isArray(parsed.headlines)) {
+    ag.headlines = parsed.headlines.filter(h => typeof h === 'string' && h.trim()).slice(0, 15).map(t => ({ text: t.trim(), pinned: null }));
+  }
+  if (Array.isArray(parsed.descriptions)) {
+    ag.descriptions = parsed.descriptions.filter(d => typeof d === 'string' && d.trim()).slice(0, 4).map(t => ({ text: t.trim(), pinned: null }));
+  }
+  saveData();
+}
+
+function exportMindmapMD() {
+  const s = MM_CURRENT_STRATEGY;
+  if (!s) return;
+  const brief = JSON.parse(localStorage.getItem('rsa2_mm_brief') || '{}');
+
+  let md = `# Campaign Strategy Plan\n\n`;
+  md += `**Generated:** ${new Date().toISOString().slice(0,10)}\n\n`;
+  md += `## Brief\n`;
+  md += `- **Product:** ${brief.product || ''}\n`;
+  md += `- **Location:** ${brief.location || ''}\n`;
+  md += `- **Budget:** $${brief.budget}/mo\n`;
+  md += `- **Timeline:** ${brief.timeline}\n`;
+  md += `- **Goal:** ${brief.goal}\n\n`;
+  md += `## Strategy Summary\n\n${s.summary}\n\n`;
+  if (s.recommendations.length) {
+    md += `### Key Recommendations\n`;
+    s.recommendations.forEach(r => md += `- ${r}\n`);
+    md += '\n';
+  }
+
+  s.campaigns.forEach(c => {
+    md += `---\n\n## 📁 ${c.name}\n\n`;
+    md += `- **Type:** ${c.type}\n`;
+    md += `- **Goal:** ${c.goal}\n`;
+    md += `- **Budget:** $${c.budget}/mo\n`;
+    if (c.targeting) {
+      const t = c.targeting;
+      if (t.location) md += `- **Location targeting:** ${t.location}\n`;
+      if (t.language) md += `- **Language:** ${t.language}\n`;
+      if (t.schedule) md += `- **Schedule:** ${t.schedule}\n`;
+      if (Array.isArray(t.audiences) && t.audiences.length) md += `- **Audiences:** ${t.audiences.join(', ')}\n`;
+    }
+    md += '\n';
+
+    c.adGroups.forEach(ag => {
+      md += `### ${ag.name}${ag.variant ? ` _(Variant ${ag.variant})_` : ''}\n\n`;
+      md += `- **Funnel:** ${ag.funnel} · **Intent:** ${ag.intent}\n`;
+      md += `- **Match type:** ${ag.matchType} · **Budget:** $${ag.budget}/mo\n`;
+      md += `- **Messaging:** ${ag.messaging}\n`;
+      md += `- **Keywords:**\n`;
+      ag.keywords.forEach(k => md += `  - ${k}\n`);
+      if (ag.negativeKeywords.length) {
+        md += `- **Negative keywords:** ${ag.negativeKeywords.map(k => '-' + k).join(', ')}\n`;
+      }
+      md += '\n';
+    });
+  });
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `strategy_${Date.now()}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('✓ Exported strategy.md');
+}
+
 // ============ UTILS ============
 function escapeHTML(s) { return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 function escapeAttr(s) { return escapeHTML(s); }
@@ -3721,6 +4633,7 @@ document.addEventListener('click', (e) => {
   if (e.target.id === 'exportModal') closeExport();
   if (e.target.id === 'perfImportModal') closePerfImport();
   if (e.target.id === 'quickPasteModal') closeQuickPasteModal();
+  if (e.target.id === 'mmReviewModal') closeReviewModal();
 });
 
 document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,3259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSA Builder Pro v4 — Google Ads Creative Suite + Quick Copy</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#eff6ff', 100:'#dbeafe', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 900:'#1e3a8a' },
+      },
+      fontFamily: { sans: ['Inter','-apple-system','BlinkMacSystemFont','Segoe UI','sans-serif'] },
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  * { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Inter', sans-serif; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+  /* Chips */
+  .chip { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:9999px; font-size:10.5px; font-weight:500; line-height:1.4; }
+  .chip-ok { background:#dcfce7; color:#166534; }
+  .chip-warn { background:#fef3c7; color:#92400e; }
+  .chip-err { background:#fee2e2; color:#991b1b; }
+  .chip-info { background:#dbeafe; color:#1e40af; }
+
+  /* Inputs */
+  input[type="text"], input[type="password"], textarea, select {
+    transition: all 0.15s; background: white; font-family: inherit;
+  }
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+    outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+
+  /* SERP preview styling */
+  .serp-ad-tag { display:inline-block; font-size:11px; font-weight:700; color:#000; padding:1px 4px; border:1px solid #000; border-radius:2px; margin-right:6px; }
+  .serp-headline { color:#1a0dab; font-size:18px; line-height:1.3; font-weight:400; }
+  .serp-url { color:#006621; font-size:12px; }
+  .serp-desc { color:#4d5156; font-size:13px; line-height:1.4; margin-top:4px; }
+  .serp-sitelink { color:#1a0dab; font-size:14px; text-decoration:none; line-height:1.3; }
+  .serp-sitelink:hover { text-decoration:underline; }
+  .serp-sitelink-desc { color:#4d5156; font-size:12px; line-height:1.3; }
+  .serp-callout { color:#4d5156; font-size:13px; }
+
+  /* Loader */
+  .loader { border: 2px solid #f3f4f6; border-top: 2px solid #3b82f6; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.6s linear infinite; display:inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Strength bar gradient */
+  .strength-bar { height: 6px; border-radius: 3px; background: #e5e7eb; overflow: hidden; position:relative; }
+  .strength-fill { height: 100%; transition: width 0.4s ease, background-color 0.3s; border-radius: 3px; }
+
+  /* Sidebar items */
+  .side-campaign { border-radius: 8px; padding: 8px 10px; cursor: pointer; transition: background 0.12s; }
+  .side-campaign:hover { background: #f3f4f6; }
+  .side-campaign.active { background: #eff6ff; }
+  .side-adgroup { border-radius: 6px; padding: 6px 10px; margin-left: 14px; cursor: pointer; transition: background 0.12s; font-size: 13px; }
+  .side-adgroup:hover { background: #f3f4f6; }
+  .side-adgroup.active { background: #dbeafe; color: #1e40af; font-weight: 500; }
+
+  /* Nav tabs */
+  .nav-tab { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #6b7280; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .nav-tab:hover { background: #f3f4f6; color: #111827; }
+  .nav-tab.active { background: white; color: #1e40af; border-color: #dbeafe; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+
+  /* Cards */
+  .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+
+  /* Animation */
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadein 0.2s ease-out; }
+
+  /* Asset row hover */
+  .asset-row { transition: all 0.15s; }
+  .asset-row:hover { border-color: #c7d2fe; }
+
+  /* UTM badge */
+  .utm-badge { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 11px; background: #1f2937; color: #e5e7eb; padding: 2px 6px; border-radius: 4px; }
+
+  /* Copy button */
+  .copy-btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 3px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 500;
+    background: #f3f4f6; color: #4b5563; cursor: pointer; border: 1px solid transparent;
+    transition: all 0.12s; font-family: inherit; flex-shrink: 0;
+  }
+  .copy-btn:hover { background: #e5e7eb; color: #111827; }
+  .copy-btn.copied { background: #dcfce7; color: #166534; border-color: #86efac; }
+  .copy-btn svg { width: 11px; height: 11px; }
+
+  /* Click-to-copy hover state */
+  .clickable-copy { cursor: pointer; position: relative; transition: background 0.12s; border-radius: 4px; padding: 1px 4px; margin: -1px -4px; }
+  .clickable-copy:hover { background: rgba(59,130,246,0.08); }
+  .clickable-copy:hover::after {
+    content: '📋 click để copy'; position: absolute; top: 100%; left: 0;
+    background: #1f2937; color: white; font-size: 10px; padding: 2px 6px;
+    border-radius: 3px; white-space: nowrap; z-index: 10; margin-top: 2px;
+    pointer-events: none;
+  }
+
+  /* Bulk copy menu */
+  .bulk-copy-menu {
+    position: absolute; top: 100%; right: 0; margin-top: 4px;
+    background: white; border: 1px solid #e5e7eb; border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 220px; z-index: 40;
+    padding: 4px;
+  }
+  .bulk-copy-menu button {
+    display: block; width: 100%; text-align: left; padding: 8px 12px;
+    font-size: 12.5px; border-radius: 6px; cursor: pointer;
+    background: transparent; color: #374151;
+  }
+  .bulk-copy-menu button:hover { background: #f3f4f6; color: #111827; }
+  .bulk-copy-menu .divider { height: 1px; background: #f3f4f6; margin: 4px 0; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<div class="flex h-screen overflow-hidden">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+    <!-- Logo -->
+    <div class="px-4 py-4 border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">R</div>
+        <div>
+          <div class="font-semibold text-sm text-gray-900">RSA Builder Pro</div>
+          <div class="text-[10px] text-gray-500 uppercase tracking-wider">Google Ads Suite</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="p-3 border-b border-gray-100">
+      <button onclick="newCampaign()" class="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New campaign
+      </button>
+    </div>
+
+    <!-- Campaign list -->
+    <div class="flex-1 overflow-y-auto px-2 py-2" id="campaignList"></div>
+
+    <!-- Footer -->
+    <div class="p-3 border-t border-gray-100 flex gap-2">
+      <button onclick="openSettings()" class="flex-1 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md flex items-center justify-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+      <button onclick="exportAll()" class="flex-1 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md flex items-center justify-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="flex-1 overflow-hidden flex flex-col">
+
+    <!-- Top bar -->
+    <header class="bg-white border-b border-gray-200 px-6 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="topBreadcrumb" class="text-sm text-gray-500">Chưa chọn campaign</div>
+        </div>
+        <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+          <div class="nav-tab active" data-view="creative" onclick="switchView('creative')">🎨 Creative</div>
+          <div class="nav-tab" data-view="extensions" onclick="switchView('extensions')">🔗 Extensions</div>
+          <div class="nav-tab" data-view="tracking" onclick="switchView('tracking')">📊 Tracking</div>
+          <div class="nav-tab" data-view="preview" onclick="switchView('preview')">👁 Preview</div>
+          <div class="nav-tab" data-view="analytics" onclick="switchView('analytics')">📈 Analytics</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto bg-gray-50">
+
+      <!-- ============ CREATIVE VIEW ============ -->
+      <div id="view-creative" class="p-6">
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">Bắt đầu với campaign đầu tiên</h2>
+          <p class="text-sm text-gray-500 mb-4">Tạo campaign mới để quản lý ad groups và RSAs</p>
+          <button onclick="newCampaign()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">+ New campaign</button>
+        </div>
+
+        <div id="campaignView" class="hidden max-w-7xl mx-auto">
+
+          <!-- Campaign header -->
+          <div class="card p-5 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Campaign name</label>
+                <input type="text" id="campName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Omega Ready Mix - Spring 2026" oninput="saveCurrent()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Default Final URL</label>
+                <input type="text" id="campURL" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="https://..." oninput="saveCurrent()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Ad Groups tabs -->
+          <div class="card p-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-sm text-gray-900">Ad Groups</h3>
+                <span id="adGroupCount" class="text-xs text-gray-500">0</span>
+              </div>
+              <button onclick="newAdGroup()" class="text-xs text-blue-600 hover:underline font-medium">+ Add ad group</button>
+            </div>
+            <div id="adGroupTabs" class="flex gap-2 flex-wrap"></div>
+          </div>
+
+          <!-- Active Ad Group -->
+          <div id="adGroupPanel" class="hidden">
+
+            <!-- Ad group settings -->
+            <div class="card p-5 mb-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-sm">📁 Ad Group Settings</h3>
+                <button onclick="deleteAdGroup()" class="text-xs text-red-600 hover:underline">Xóa ad group</button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Ad Group name *</label>
+                  <input type="text" id="agName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Ready Mix Delivery" oninput="saveCurrent()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Ad Group theme / focus *</label>
+                  <input type="text" id="agTheme" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Fast concrete delivery service" oninput="saveCurrent()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Main keywords (1 dòng 1 từ)</label>
+                  <textarea id="agKeywords" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="ready mix concrete calgary&#10;concrete delivery" oninput="saveCurrent()"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">USP / Value props</label>
+                  <textarea id="agUSP" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: 20+ năm kinh nghiệm, giao hàng 2h" oninput="saveCurrent()"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Offer / Promotion</label>
+                  <input type="text" id="agOffer" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="VD: Miễn phí báo giá" oninput="saveCurrent()">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tone</label>
+                    <select id="agTone" class="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveCurrent()">
+                      <option value="professional">Pro</option>
+                      <option value="friendly">Friendly</option>
+                      <option value="urgent">Urgent</option>
+                      <option value="luxury">Luxury</option>
+                      <option value="direct">Direct</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Lang</label>
+                    <select id="agLang" class="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm" onchange="saveCurrent()">
+                      <option value="english">EN</option>
+                      <option value="vietnamese">VI</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">&nbsp;</label>
+                    <button onclick="generateCreative()" id="genBtn" class="w-full px-2 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center justify-center gap-1">✨ AI Gen</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 mt-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Final URL (override)</label>
+                  <input type="text" id="agURL" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="dùng campaign URL nếu trống" oninput="saveCurrent()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Path 1 (15)</label>
+                  <input type="text" id="agPath1" maxlength="15" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" oninput="saveCurrent()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Path 2 (15)</label>
+                  <input type="text" id="agPath2" maxlength="15" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" oninput="saveCurrent()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Creative area -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+              <!-- Headlines -->
+              <div class="card p-5 lg:col-span-2">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-semibold text-sm">📝 Headlines <span id="hCount" class="text-xs font-normal text-gray-500 ml-1">0/15</span></h3>
+                  <div class="flex items-center gap-2">
+                    <div class="relative">
+                      <button onclick="toggleBulkMenu('hBulkMenu', this)" class="copy-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy all ▾
+                      </button>
+                      <div id="hBulkMenu" class="bulk-copy-menu hidden">
+                        <button onclick="copyAllByIndex('headlines-lines', null, this)">📋 Mỗi headline 1 dòng</button>
+                        <button onclick="copyAllByIndex('headlines-pipe', null, this)">📋 Ngăn bằng dấu |</button>
+                        <div class="divider"></div>
+                        <button onclick="copyAllByIndex('adgroup-all', null, this)">📦 Toàn bộ ad group</button>
+                      </div>
+                    </div>
+                    <button onclick="addHeadline()" class="text-xs text-blue-600 hover:underline">+ Thêm</button>
+                  </div>
+                </div>
+                <div id="headlinesList" class="space-y-2"></div>
+
+                <div class="flex items-center justify-between mt-4 mb-2">
+                  <h3 class="font-semibold text-sm">📄 Descriptions <span id="dCount" class="text-xs font-normal text-gray-500 ml-1">0/4</span></h3>
+                  <div class="flex items-center gap-2">
+                    <button onclick="copyAllByIndex('descriptions-lines', null, this)" class="copy-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy all
+                    </button>
+                    <button onclick="addDescription()" class="text-xs text-blue-600 hover:underline">+ Thêm</button>
+                  </div>
+                </div>
+                <div id="descriptionsList" class="space-y-2"></div>
+              </div>
+
+              <!-- Ad Strength -->
+              <div>
+                <div class="card p-5 mb-4">
+                  <h3 class="font-semibold text-sm mb-3">📊 Ad Strength</h3>
+                  <div class="text-center mb-3">
+                    <div id="strengthLabel" class="text-2xl font-bold text-gray-400">—</div>
+                    <div id="strengthScore" class="text-xs text-gray-500 mt-0.5">Cần thêm dữ liệu</div>
+                  </div>
+                  <div class="strength-bar mb-3"><div id="strengthFill" class="strength-fill" style="width:0%;background:#e5e7eb"></div></div>
+                  <div id="strengthTips" class="space-y-1.5"></div>
+                </div>
+
+                <div class="card p-5">
+                  <h3 class="font-semibold text-sm mb-3">⚡ Quick Copy</h3>
+                  <p class="text-[11px] text-gray-500 mb-2">Copy nhanh để paste vào Google Ads:</p>
+                  <div class="space-y-1.5">
+                    <button onclick="copyAllByIndex('headlines-lines', null, this)" class="w-full text-left px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-blue-900">📝 All headlines</span>
+                      <span class="text-[10px] text-blue-600">→ clipboard</span>
+                    </button>
+                    <button onclick="copyAllByIndex('descriptions-lines', null, this)" class="w-full text-left px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-blue-900">📄 All descriptions</span>
+                      <span class="text-[10px] text-blue-600">→ clipboard</span>
+                    </button>
+                    <button onclick="copyAllByIndex('final-url', null, this)" class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-gray-700">🌐 Final URL</span>
+                      <span class="text-[10px] text-gray-500">→ clipboard</span>
+                    </button>
+                    <button onclick="copyAllByIndex('paths', null, this)" class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-gray-700">📁 Path 1 + Path 2</span>
+                      <span class="text-[10px] text-gray-500">→ clipboard</span>
+                    </button>
+                    <button onclick="copyAllByIndex('keywords-lines', null, this)" class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-gray-700">🔑 Keywords</span>
+                      <span class="text-[10px] text-gray-500">→ clipboard</span>
+                    </button>
+                    <div class="border-t border-gray-100 my-2"></div>
+                    <button onclick="copyAllByIndex('adgroup-all', null, this)" class="w-full text-left px-3 py-2 bg-green-50 hover:bg-green-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-green-900">📦 Full ad group</span>
+                      <span class="text-[10px] text-green-700">formatted</span>
+                    </button>
+                    <button onclick="openQuickPasteModal()" class="w-full text-left px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-xs flex items-center justify-between transition">
+                      <span class="font-medium text-purple-900">👁 View / Copy mode</span>
+                      <span class="text-[10px] text-purple-700">paste 1 by 1</span>
+                    </button>
+                  </div>
+                  <div class="border-t border-gray-100 mt-3 pt-3 space-y-1">
+                    <button onclick="duplicateAdGroup()" class="w-full px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-[11px] font-medium">⎘ Duplicate ad group</button>
+                    <button onclick="regenerateOne()" class="w-full px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-[11px] font-medium">🔄 Regenerate AI</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ EXTENSIONS VIEW ============ -->
+      <div id="view-extensions" class="p-6 hidden">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-5">
+            <h2 class="text-lg font-semibold">🔗 Ad Extensions (Assets)</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Các asset này áp dụng cho cả campaign (hoặc riêng từng ad group nếu override)</p>
+          </div>
+
+          <!-- Scope selector -->
+          <div class="card p-3 mb-4 flex items-center gap-3">
+            <span class="text-xs font-medium text-gray-600">Áp dụng cho:</span>
+            <div class="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-xs">
+              <button onclick="setExtScope('campaign')" id="scopeCampaign" class="px-3 py-1.5 rounded-md font-medium">Campaign</button>
+              <button onclick="setExtScope('adgroup')" id="scopeAdgroup" class="px-3 py-1.5 rounded-md font-medium">Ad Group hiện tại</button>
+            </div>
+            <span id="scopeLabel" class="text-xs text-gray-500 ml-auto"></span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            <!-- Sitelinks -->
+            <div class="card p-5">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-semibold text-sm">🔗 Sitelinks</h3>
+                <div class="flex items-center gap-2">
+                  <span id="slCount" class="text-xs text-gray-500">0/8</span>
+                  <div class="relative">
+                    <button onclick="toggleBulkMenu('slBulkMenu', this)" class="copy-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy all ▾
+                    </button>
+                    <div id="slBulkMenu" class="bulk-copy-menu hidden">
+                      <button onclick="copyAllByIndex('sitelinks-text', null, this)">📋 Chỉ link text (1 dòng / link)</button>
+                      <button onclick="copyAllByIndex('sitelinks-full', null, this)">📊 Full data (TSV - paste vào Sheets)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Tối thiểu 4, tối đa 8. Text 25 ký tự, description 35 ký tự.</p>
+              <div id="sitelinksList" class="space-y-2 mb-2"></div>
+              <button onclick="addSitelink()" class="w-full py-2 text-xs text-blue-600 border border-dashed border-blue-300 rounded-lg hover:bg-blue-50 font-medium">+ Add sitelink</button>
+            </div>
+
+            <!-- Callouts -->
+            <div class="card p-5">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-semibold text-sm">✨ Callouts</h3>
+                <div class="flex items-center gap-2">
+                  <span id="coCount" class="text-xs text-gray-500">0/10</span>
+                  <div class="relative">
+                    <button onclick="toggleBulkMenu('coBulkMenu', this)" class="copy-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy all ▾
+                    </button>
+                    <div id="coBulkMenu" class="bulk-copy-menu hidden">
+                      <button onclick="copyAllByIndex('callouts-lines', null, this)">📋 Mỗi callout 1 dòng</button>
+                      <button onclick="copyAllByIndex('callouts-comma', null, this)">📋 Ngăn cách dấu phẩy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Cụm từ ngắn 25 ký tự, highlight benefits. Tối thiểu 4.</p>
+              <div id="calloutsList" class="space-y-2 mb-2"></div>
+              <button onclick="addCallout()" class="w-full py-2 text-xs text-blue-600 border border-dashed border-blue-300 rounded-lg hover:bg-blue-50 font-medium">+ Add callout</button>
+            </div>
+
+            <!-- Structured snippets -->
+            <div class="card p-5 lg:col-span-2">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-semibold text-sm">📋 Structured Snippets</h3>
+                <span id="ssCount" class="text-xs text-gray-500">0</span>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Header (ví dụ "Services") + 3-10 values. Tạo nhiều snippets với headers khác nhau.</p>
+              <div id="snippetsList" class="space-y-3 mb-2"></div>
+              <button onclick="addSnippet()" class="w-full py-2 text-xs text-blue-600 border border-dashed border-blue-300 rounded-lg hover:bg-blue-50 font-medium">+ Add structured snippet</button>
+            </div>
+
+            <!-- AI Generate extensions -->
+            <div class="card p-5 lg:col-span-2 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-sm mb-1">🚀 Auto-generate extensions</h3>
+                  <p class="text-xs text-gray-600">AI tự tạo sitelinks + callouts + snippets từ brief của bạn</p>
+                </div>
+                <button onclick="generateExtensions()" id="genExtBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">✨ Generate all</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TRACKING VIEW ============ -->
+      <div id="view-tracking" class="p-6 hidden">
+        <div class="max-w-5xl mx-auto">
+          <div class="mb-5">
+            <h2 class="text-lg font-semibold">📊 UTM & Tracking</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Thiết lập tracking template để theo dõi performance trong GA4</p>
+          </div>
+
+          <div class="card p-5 mb-4">
+            <h3 class="font-semibold text-sm mb-3">🎯 UTM Builder</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">utm_source</label>
+                <input type="text" id="utmSource" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value="google" oninput="rebuildUTM()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">utm_medium</label>
+                <input type="text" id="utmMedium" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value="cpc" oninput="rebuildUTM()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">utm_campaign</label>
+                <select id="utmCampaign" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" oninput="rebuildUTM()">
+                  <option value="{campaignname}">{campaignname} (auto)</option>
+                  <option value="custom">Custom value</option>
+                </select>
+                <input type="text" id="utmCampaignCustom" class="hidden w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Custom value" oninput="rebuildUTM()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">utm_content (Ad Group)</label>
+                <select id="utmContent" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" oninput="rebuildUTM()">
+                  <option value="{adgroupname}">{adgroupname} (auto)</option>
+                  <option value="{creative}">{creative} (ad ID)</option>
+                  <option value="custom">Custom value</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">utm_term (Keyword)</label>
+                <select id="utmTerm" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" oninput="rebuildUTM()">
+                  <option value="{keyword}">{keyword} (auto)</option>
+                  <option value="{searchterm}">{searchterm} (actual search)</option>
+                  <option value="none">None (bỏ qua)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Extra params</label>
+                <input type="text" id="utmExtra" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono text-xs" placeholder="gclid={gclid}&device={device}" oninput="rebuildUTM()">
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-5 mb-4 bg-gray-900 text-gray-100">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold text-sm text-white">🔖 Tracking Template Preview</h3>
+              <button onclick="copyTrackingTemplate()" class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white">Copy</button>
+            </div>
+            <code id="trackingTemplate" class="text-xs break-all block bg-black p-3 rounded-md font-mono"></code>
+            <div class="mt-3 text-xs text-gray-400">
+              Dán vào Google Ads: <strong class="text-white">Campaign settings → Additional settings → Campaign URL options → Tracking template</strong>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-sm">🔍 Final URL Preview</h3>
+              <button onclick="copyText(document.getElementById('finalUrlPreview').textContent, this)" class="copy-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy URL
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mb-3">URL mà người dùng thực tế sẽ land khi click:</p>
+            <code id="finalUrlPreview" class="text-xs break-all block bg-gray-100 p-3 rounded-md font-mono text-gray-800"></code>
+            <div class="mt-3 grid grid-cols-2 gap-3 text-xs">
+              <div><span class="chip chip-info">Tip</span> <span class="text-gray-600">{keyword} chỉ hoạt động với Search campaigns</span></div>
+              <div><span class="chip chip-info">Tip</span> <span class="text-gray-600">ValueTrack không được set thủ công — Google replace tự động</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PREVIEW VIEW ============ -->
+      <div id="view-preview" class="p-6 hidden">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-lg font-semibold">👁 SERP Preview</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Mô phỏng ad hiển thị trên Google Search</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-xs">
+                <button onclick="setPreviewDevice('desktop')" id="pvDesktop" class="px-3 py-1.5 rounded-md font-medium bg-white shadow-sm">🖥 Desktop</button>
+                <button onclick="setPreviewDevice('mobile')" id="pvMobile" class="px-3 py-1.5 rounded-md font-medium">📱 Mobile</button>
+              </div>
+              <button onclick="rollPreview()" class="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700">🔄 Shuffle</button>
+            </div>
+          </div>
+
+          <div id="previewContainer" class="transition-all"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+      <!-- ============ ANALYTICS VIEW ============ -->
+      <div id="view-analytics" class="p-6 hidden">
+        <div class="max-w-7xl mx-auto">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-lg font-semibold">📈 Campaign Analytics</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Đánh giá chất lượng, phát hiện vấn đề, và so sánh performance</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openPerfImport()" class="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">📊 Import Performance Data</button>
+              <button onclick="runAIVerdict()" id="aiVerdictBtn" class="text-xs px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 font-medium">🤖 AI Audit Report</button>
+            </div>
+          </div>
+
+          <!-- SECTION 1: Campaign Health Dashboard -->
+          <div class="card p-5 mb-4">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <!-- Big score -->
+              <div class="lg:col-span-1 flex flex-col items-center justify-center text-center border-r border-gray-100 pr-4">
+                <div class="relative w-32 h-32">
+                  <svg class="w-32 h-32 transform -rotate-90">
+                    <circle cx="64" cy="64" r="56" stroke="#f3f4f6" stroke-width="10" fill="none"/>
+                    <circle id="healthRing" cx="64" cy="64" r="56" stroke="#3b82f6" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352" style="transition:stroke-dashoffset 0.6s, stroke 0.3s"/>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div id="healthScore" class="text-3xl font-bold text-gray-900">—</div>
+                    <div id="healthLabel" class="text-xs text-gray-500">Health</div>
+                  </div>
+                </div>
+                <div id="healthVerdict" class="text-xs text-gray-600 mt-3 max-w-[200px]">Cần thêm data</div>
+              </div>
+
+              <!-- Metrics -->
+              <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Ad Strength TB</div>
+                  <div id="metricAS" class="text-2xl font-bold text-gray-900">—</div>
+                  <div id="metricASBar" class="strength-bar mt-1.5"><div class="strength-fill" style="width:0%;background:#e5e7eb"></div></div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Extensions</div>
+                  <div id="metricExt" class="text-2xl font-bold text-gray-900">—</div>
+                  <div id="metricExtDesc" class="text-[10px] text-gray-500 mt-0.5">—</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Diversity</div>
+                  <div id="metricDiv" class="text-2xl font-bold text-gray-900">—</div>
+                  <div id="metricDivDesc" class="text-[10px] text-gray-500 mt-0.5">Angle coverage</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Completeness</div>
+                  <div id="metricComp" class="text-2xl font-bold text-gray-900">—</div>
+                  <div id="metricCompDesc" class="text-[10px] text-gray-500 mt-0.5">Fields đã điền</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top issues -->
+            <div class="mt-5 pt-4 border-t border-gray-100">
+              <div class="text-xs font-semibold text-gray-700 mb-2">🎯 Top issues cần fix ngay</div>
+              <div id="topIssues" class="space-y-1.5"></div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Ad Group Leaderboard -->
+          <div class="card p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-sm">🏆 Ad Group Leaderboard</h3>
+              <span id="lbCount" class="text-xs text-gray-500">0 groups</span>
+            </div>
+
+            <!-- Comparison chart -->
+            <div class="mb-4 bg-gray-50 rounded-lg p-3">
+              <canvas id="leaderboardChart" height="80"></canvas>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+                    <th class="pb-2 pr-2">#</th>
+                    <th class="pb-2 pr-2">Ad Group</th>
+                    <th class="pb-2 pr-2">Score</th>
+                    <th class="pb-2 pr-2">H/D</th>
+                    <th class="pb-2 pr-2">💚 Tốt vì</th>
+                    <th class="pb-2 pr-2">⚠ Yếu vì</th>
+                    <th class="pb-2 pr-2 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Duplicate Detector -->
+          <div class="card p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-sm">🔍 Duplicate Detector</h3>
+              <span id="dupCount" class="text-xs text-gray-500">Scanning...</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3">Phát hiện headline/description trùng hoặc gần giống nhau (similarity &gt;60%). Trùng sẽ khiến Google không học được variation tốt.</p>
+            <div id="dupResults" class="space-y-2"></div>
+          </div>
+
+          <!-- SECTION 4: Creative Diversity -->
+          <div class="card p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-semibold text-sm">🎨 Creative Diversity Analysis</h3>
+                <p class="text-xs text-gray-500 mt-0.5">14 angles quảng cáo — bạn cover bao nhiêu?</p>
+              </div>
+              <select id="divAgSelect" onchange="renderDiversity()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs"></select>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="bg-gray-50 rounded-lg p-3">
+                <div class="text-xs text-gray-600 mb-2 font-medium">Angle coverage radar</div>
+                <canvas id="diversityRadar" height="260"></canvas>
+              </div>
+              <div>
+                <div class="text-xs text-gray-600 mb-2 font-medium">Phân loại từng headline</div>
+                <div id="headlineClassification" class="space-y-1 max-h-80 overflow-y-auto"></div>
+                <div class="mt-3 pt-3 border-t border-gray-100">
+                  <div class="text-xs font-semibold text-gray-700 mb-1.5">Gợi ý</div>
+                  <div id="divSuggestions" class="space-y-1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: Keyword Alignment -->
+          <div class="card p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-semibold text-sm">🎯 Keyword-to-Ad Alignment</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Mỗi keyword có được phản ánh trong headlines không?</p>
+              </div>
+            </div>
+            <div id="kwAlignment" class="space-y-3"></div>
+          </div>
+
+          <!-- SECTION 6: Performance Heatmap (nếu có data) -->
+          <div id="perfSection" class="card p-5 mb-4 hidden">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-semibold text-sm">📊 Performance Heatmap</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Dựa trên data imported từ Google Ads</p>
+              </div>
+              <button onclick="clearPerfData()" class="text-xs text-red-600 hover:underline">Clear data</button>
+            </div>
+            <div id="perfContent"></div>
+          </div>
+
+          <!-- SECTION 7: AI Verdict Result -->
+          <div id="aiVerdictSection" class="card p-5 mb-4 hidden bg-gradient-to-br from-purple-50 to-blue-50 border-blue-200">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-sm">🤖 AI Audit Report</h3>
+              <button onclick="document.getElementById('aiVerdictSection').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+            </div>
+            <div id="aiVerdictContent" class="prose prose-sm max-w-none text-gray-800 text-sm whitespace-pre-wrap"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Performance Import Modal -->
+      <div id="perfImportModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-xl p-6 max-w-xl w-full shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg">📊 Import Performance Data</h3>
+            <button onclick="closePerfImport()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+          </div>
+          <p class="text-xs text-gray-600 mb-3">Paste report từ Google Ads (Columns: <span class="font-mono bg-gray-100 px-1 rounded">Ad group, Impressions, Clicks, CTR, Conversions, Cost</span>) hoặc upload CSV.</p>
+          <textarea id="perfPasteArea" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs font-mono mb-3" placeholder="Ad group,Impressions,Clicks,CTR,Conversions,Cost&#10;Fast Delivery,12500,487,3.9%,23,485.20&#10;Pricing,8900,203,2.3%,8,312.50"></textarea>
+          <div class="flex items-center gap-2 mb-3">
+            <label class="flex-1 text-xs text-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+              📂 Upload CSV
+              <input type="file" accept=".csv" class="hidden" onchange="parsePerfCSV(event)">
+            </label>
+            <button onclick="parsePerfPaste()" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">Parse text</button>
+          </div>
+          <div class="text-xs text-gray-500">
+            <strong>Cách lấy data:</strong> Google Ads → Ad groups → View → Download → CSV → Tên cột phải khớp với tên ad group trong tool.
+          </div>
+        </div>
+      </div>
+
+
+<!-- Quick Paste Modal -->
+<div id="quickPasteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
+  <div class="bg-white rounded-xl p-5 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="font-semibold text-lg">⚡ Quick Paste Mode</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Click vào bất kỳ item nào để copy. Đánh dấu ✓ khi đã paste xong vào Google Ads.</p>
+      </div>
+      <button onclick="closeQuickPasteModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+    <div id="quickPasteContent"></div>
+  </div>
+</div>
+
+<div id="settingsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
+  <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-lg">⚙ Settings</h3>
+      <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+    <div class="space-y-4 text-sm">
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">OpenRouter API Key</label>
+        <input type="password" id="apiKeyInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono" placeholder="sk-or-v1-...">
+        <div class="text-xs text-gray-500 mt-1">Lưu local trong browser. Lấy key tại <a href="https://openrouter.ai/keys" target="_blank" class="text-blue-600 underline">openrouter.ai/keys</a></div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">Model</label>
+        <select id="modelSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <option value="deepseek/deepseek-chat-v3.1:free">DeepSeek v3.1 (Free)</option>
+          <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
+          <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+          <option value="deepseek/deepseek-r1">DeepSeek R1</option>
+        </select>
+      </div>
+      <div class="pt-3 border-t border-gray-100">
+        <button onclick="clearAllData()" class="text-xs text-red-600 hover:underline">🗑 Xóa toàn bộ data (campaigns, settings)</button>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveSettings()" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">Save</button>
+        <button onclick="closeSettings()" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export modal -->
+<div id="exportModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 fade-in">
+  <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-lg">📥 Export</h3>
+      <button onclick="closeExport()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Xuất toàn bộ campaign hoặc riêng ad group hiện tại ra CSV cho Google Ads Editor</p>
+    <div class="space-y-2">
+      <button onclick="exportCampaignCSV()" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+        <div class="font-medium text-sm">📦 Export full campaign (RSAs)</div>
+        <div class="text-xs text-gray-500">CSV chứa tất cả ad groups + RSAs của campaign hiện tại</div>
+      </button>
+      <button onclick="exportExtensionsCSV()" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+        <div class="font-medium text-sm">🔗 Export extensions</div>
+        <div class="text-xs text-gray-500">Sitelinks, callouts, structured snippets</div>
+      </button>
+      <button onclick="exportJSON()" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+        <div class="font-medium text-sm">💾 Export JSON backup</div>
+        <div class="text-xs text-gray-500">Sao lưu toàn bộ data để import lại sau</div>
+      </button>
+      <label class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer block">
+        <div class="font-medium text-sm">📂 Import JSON backup</div>
+        <div class="text-xs text-gray-500">Restore data từ file JSON trước đó</div>
+        <input type="file" accept=".json" class="hidden" onchange="importJSON(event)">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-2.5 rounded-lg shadow-xl text-sm z-50 fade-in"></div>
+
+<script>
+// ============ STATE ============
+const STATE = {
+  currentView: 'creative',
+  activeCampaignId: null,
+  activeAdGroupId: null,
+  extScope: 'campaign', // 'campaign' or 'adgroup'
+  previewDevice: 'desktop',
+  campaigns: [],
+  settings: {
+    apiKey: '',
+    model: 'deepseek/deepseek-chat-v3.1:free'
+  }
+};
+
+// Data model:
+// campaign = { id, name, url, utm:{source,medium,campaign,campaignCustom,content,term,extra}, extensions:{sitelinks,callouts,snippets}, adGroups:[] }
+// adGroup = { id, name, theme, keywords, usp, offer, tone, lang, url, path1, path2, headlines:[], descriptions:[], extensions:{sitelinks,callouts,snippets,override:false} }
+
+// ============ COPY UTILITIES ============
+function copyText(text, btn) {
+  if (!text) { toast('Không có nội dung để copy'); return Promise.resolve(false); }
+  return navigator.clipboard.writeText(text).then(() => {
+    if (btn) {
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = original;
+      }, 1500);
+    }
+    return true;
+  }).catch(() => {
+    toast('✗ Không copy được');
+    return false;
+  });
+}
+
+function copyButton(textEscaped, label = 'Copy') {
+  // Returns HTML for a small inline copy button
+  return `<button class="copy-btn" onclick="event.stopPropagation(); copyText(decodeURIComponent('${textEscaped}'), this)" title="Copy">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>`;
+}
+
+function copyAllByIndex(type, idx = null, btn = null) {
+  // Called by bulk copy menus
+  const ag = activeAdGroup();
+  const c = activeCampaign();
+  if (!ag && !c) return;
+
+  let text = '';
+  if (type === 'headlines-lines') {
+    text = ag.headlines.filter(h=>h.text.trim()).map(h => h.text).join('\n');
+  } else if (type === 'headlines-pipe') {
+    text = ag.headlines.filter(h=>h.text.trim()).map(h => h.text).join(' | ');
+  } else if (type === 'descriptions-lines') {
+    text = ag.descriptions.filter(d=>d.text.trim()).map(d => d.text).join('\n');
+  } else if (type === 'sitelinks-text') {
+    const ext = currentExtObj();
+    text = ext.sitelinks.filter(s=>s.text.trim()).map(s => s.text).join('\n');
+  } else if (type === 'sitelinks-full') {
+    const ext = currentExtObj();
+    text = ext.sitelinks.filter(s=>s.text.trim()).map(s =>
+      `${s.text}\t${s.url}\t${s.desc1}\t${s.desc2}`
+    ).join('\n');
+    text = 'Sitelink text\tFinal URL\tDescription 1\tDescription 2\n' + text;
+  } else if (type === 'callouts-lines') {
+    const ext = currentExtObj();
+    text = ext.callouts.filter(co=>co.text.trim()).map(co => co.text).join('\n');
+  } else if (type === 'callouts-comma') {
+    const ext = currentExtObj();
+    text = ext.callouts.filter(co=>co.text.trim()).map(co => co.text).join(', ');
+  } else if (type === 'snippet-values') {
+    const ext = currentExtObj();
+    const sn = ext.snippets[idx];
+    if (sn) text = sn.values.filter(v=>v.trim()).join('\n');
+  } else if (type === 'adgroup-all') {
+    // Full ad group for Google Ads paste
+    text = formatAdGroupForGoogleAds(ag, c);
+  } else if (type === 'tracking-template') {
+    text = document.getElementById('trackingTemplate').textContent;
+  } else if (type === 'keywords-lines') {
+    text = (ag.keywords || '').trim();
+  } else if (type === 'paths') {
+    text = `${ag.path1 || ''}\t${ag.path2 || ''}`;
+  } else if (type === 'final-url') {
+    text = ag.url || c.url || '';
+  }
+
+  copyText(text, btn);
+}
+
+function formatAdGroupForGoogleAds(ag, c) {
+  let out = '';
+  out += `AD GROUP: ${ag.name}\n`;
+  out += `FINAL URL: ${ag.url || c.url || ''}\n`;
+  if (ag.path1 || ag.path2) out += `PATHS: /${ag.path1 || ''}/${ag.path2 || ''}\n`;
+  out += '\n--- HEADLINES ---\n';
+  ag.headlines.forEach((h, i) => {
+    if (h.text.trim()) out += `${h.text}${h.pinned ? ' [pin:'+h.pinned+']' : ''}\n`;
+  });
+  out += '\n--- DESCRIPTIONS ---\n';
+  ag.descriptions.forEach((d, i) => {
+    if (d.text.trim()) out += `${d.text}${d.pinned ? ' [pin:'+d.pinned+']' : ''}\n`;
+  });
+  return out;
+}
+
+function toggleBulkMenu(menuId, btn) {
+  const menu = document.getElementById(menuId);
+  if (!menu) return;
+  // Close all other menus first
+  document.querySelectorAll('.bulk-copy-menu').forEach(m => {
+    if (m.id !== menuId) m.classList.add('hidden');
+  });
+  menu.classList.toggle('hidden');
+  // Position adjustment for parent relative positioning already handled in CSS
+  if (!menu.classList.contains('hidden')) {
+    setTimeout(() => {
+      const closeOnOutside = (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+          menu.classList.add('hidden');
+          document.removeEventListener('click', closeOnOutside);
+        }
+      };
+      document.addEventListener('click', closeOnOutside);
+    }, 0);
+  }
+}
+
+function encURI(s) { return encodeURIComponent(s || ''); }
+
+// ============ QUICK PASTE MODAL ============
+const PASTE_CHECKED = {}; // { key: boolean }
+
+function openQuickPasteModal() {
+  const ag = activeAdGroup();
+  const c = activeCampaign();
+  if (!ag || !c) { toast('Chưa có ad group'); return; }
+  renderQuickPaste();
+  document.getElementById('quickPasteModal').classList.remove('hidden');
+}
+function closeQuickPasteModal() {
+  document.getElementById('quickPasteModal').classList.add('hidden');
+}
+function toggleCheck(key) {
+  PASTE_CHECKED[key] = !PASTE_CHECKED[key];
+  renderQuickPaste();
+}
+function resetChecks() {
+  Object.keys(PASTE_CHECKED).forEach(k => delete PASTE_CHECKED[k]);
+  renderQuickPaste();
+}
+
+function renderQuickPaste() {
+  const ag = activeAdGroup();
+  const c = activeCampaign();
+  if (!ag || !c) return;
+
+  const finalUrl = ag.url || c.url || '';
+  const ext = (ag.extensions.sitelinks.length + ag.extensions.callouts.length + ag.extensions.snippets.length > 0) ? ag.extensions : c.extensions;
+
+  const validHeadlines = ag.headlines.filter(h => h.text.trim());
+  const validDescs = ag.descriptions.filter(d => d.text.trim());
+  const validSitelinks = ext.sitelinks.filter(s => s.text.trim());
+  const validCallouts = ext.callouts.filter(co => co.text.trim());
+  const validSnippets = ext.snippets.filter(sn => sn.values.filter(v=>v.trim()).length >= 3);
+
+  const totalCount = validHeadlines.length + validDescs.length + validSitelinks.length + validCallouts.length + (finalUrl?1:0) + (ag.path1||ag.path2?1:0);
+  const checkedCount = Object.values(PASTE_CHECKED).filter(v => v).length;
+
+  const renderItem = (key, label, text, sub = '') => {
+    const checked = PASTE_CHECKED[key];
+    return `
+      <div class="flex items-center gap-2 border ${checked?'border-green-300 bg-green-50':'border-gray-200 bg-white hover:border-blue-300'} rounded-lg p-2 transition group">
+        <button onclick="toggleCheck('${key}')" class="w-5 h-5 rounded border-2 ${checked?'bg-green-500 border-green-500 text-white':'border-gray-300 hover:border-blue-500'} flex items-center justify-center text-xs flex-shrink-0">
+          ${checked ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </button>
+        <div class="flex-1 min-w-0">
+          ${label ? `<div class="text-[10px] text-gray-500 uppercase tracking-wider">${label}</div>` : ''}
+          <div class="text-sm ${checked?'text-gray-400 line-through':'text-gray-900'} truncate">${escapeHTML(text)}</div>
+          ${sub ? `<div class="text-[10px] text-gray-500 truncate">${escapeHTML(sub)}</div>` : ''}
+        </div>
+        <button class="copy-btn flex-shrink-0" onclick="copyText(decodeURIComponent('${encURI(text)}'), this)" title="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    `;
+  };
+
+  let html = `
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 mb-3 flex items-center justify-between">
+      <div>
+        <div class="text-xs font-semibold text-gray-900">${escapeHTML(ag.name)}</div>
+        <div class="text-[10px] text-gray-600">${checkedCount}/${totalCount} items đã paste</div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-24 bg-white rounded-full h-1.5 overflow-hidden">
+          <div class="h-full bg-green-500 transition-all" style="width:${totalCount?(checkedCount/totalCount)*100:0}%"></div>
+        </div>
+        <button onclick="resetChecks()" class="text-[10px] text-gray-500 hover:text-gray-900 underline">Reset</button>
+      </div>
+    </div>
+  `;
+
+  // Setup
+  if (finalUrl) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">🌐 Setup</div>';
+    html += renderItem('final-url', 'Final URL', finalUrl);
+  }
+  if (ag.path1 || ag.path2) {
+    html += renderItem('paths', 'Paths', `/${ag.path1||''}/${ag.path2||''}`, 'Path 1 / Path 2');
+  }
+
+  // Headlines
+  if (validHeadlines.length > 0) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">📝 Headlines (' + validHeadlines.length + ')</div>';
+    html += '<div class="space-y-1">';
+    validHeadlines.forEach((h, i) => {
+      const pin = h.pinned ? ` · Pin ${h.pinned}` : '';
+      html += renderItem('h-'+i, `Headline ${i+1}${pin}`, h.text, `${h.text.length}/30 chars`);
+    });
+    html += '</div>';
+  }
+
+  // Descriptions
+  if (validDescs.length > 0) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">📄 Descriptions (' + validDescs.length + ')</div>';
+    html += '<div class="space-y-1">';
+    validDescs.forEach((d, i) => {
+      const pin = d.pinned ? ` · Pin ${d.pinned}` : '';
+      html += renderItem('d-'+i, `Description ${i+1}${pin}`, d.text, `${d.text.length}/90 chars`);
+    });
+    html += '</div>';
+  }
+
+  // Sitelinks
+  if (validSitelinks.length > 0) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">🔗 Sitelinks (' + validSitelinks.length + ')</div>';
+    html += '<div class="space-y-1">';
+    validSitelinks.forEach((s, i) => {
+      html += `
+        <div class="border ${PASTE_CHECKED['sl-'+i]?'border-green-300 bg-green-50':'border-gray-200 bg-white'} rounded-lg p-2">
+          <div class="flex items-start gap-2">
+            <button onclick="toggleCheck('sl-${i}')" class="w-5 h-5 rounded border-2 ${PASTE_CHECKED['sl-'+i]?'bg-green-500 border-green-500 text-white':'border-gray-300'} flex items-center justify-center text-xs mt-0.5 flex-shrink-0">
+              ${PASTE_CHECKED['sl-'+i] ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+            </button>
+            <div class="flex-1 space-y-1 min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-gray-500 uppercase tracking-wider w-16 flex-shrink-0">Link text</span>
+                <span class="text-sm truncate flex-1 ${PASTE_CHECKED['sl-'+i]?'text-gray-400 line-through':''}">${escapeHTML(s.text)}</span>
+                <button class="copy-btn flex-shrink-0" onclick="copyText(decodeURIComponent('${encURI(s.text)}'), this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+              ${s.url ? `<div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-gray-500 uppercase tracking-wider w-16 flex-shrink-0">URL</span>
+                <span class="text-xs font-mono text-gray-600 truncate flex-1">${escapeHTML(s.url)}</span>
+                <button class="copy-btn flex-shrink-0" onclick="copyText(decodeURIComponent('${encURI(s.url)}'), this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>` : ''}
+              ${s.desc1 ? `<div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-gray-500 uppercase tracking-wider w-16 flex-shrink-0">Desc 1</span>
+                <span class="text-xs truncate flex-1">${escapeHTML(s.desc1)}</span>
+                <button class="copy-btn flex-shrink-0" onclick="copyText(decodeURIComponent('${encURI(s.desc1)}'), this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>` : ''}
+              ${s.desc2 ? `<div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-gray-500 uppercase tracking-wider w-16 flex-shrink-0">Desc 2</span>
+                <span class="text-xs truncate flex-1">${escapeHTML(s.desc2)}</span>
+                <button class="copy-btn flex-shrink-0" onclick="copyText(decodeURIComponent('${encURI(s.desc2)}'), this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+
+  // Callouts
+  if (validCallouts.length > 0) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">✨ Callouts (' + validCallouts.length + ')</div>';
+    html += '<div class="space-y-1">';
+    validCallouts.forEach((co, i) => {
+      html += renderItem('co-'+i, '', co.text, `${co.text.length}/25 chars`);
+    });
+    html += '</div>';
+  }
+
+  // Structured snippets
+  if (validSnippets.length > 0) {
+    html += '<div class="text-xs font-semibold text-gray-700 mb-1 mt-3">📋 Structured Snippets</div>';
+    html += '<div class="space-y-2">';
+    validSnippets.forEach((sn, i) => {
+      const values = sn.values.filter(v => v.trim());
+      html += `
+        <div class="border ${PASTE_CHECKED['sn-'+i]?'border-green-300 bg-green-50':'border-gray-200 bg-white'} rounded-lg p-2">
+          <div class="flex items-center gap-2 mb-1">
+            <button onclick="toggleCheck('sn-${i}')" class="w-5 h-5 rounded border-2 ${PASTE_CHECKED['sn-'+i]?'bg-green-500 border-green-500 text-white':'border-gray-300'} flex items-center justify-center text-xs flex-shrink-0">
+              ${PASTE_CHECKED['sn-'+i] ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+            </button>
+            <span class="text-xs font-medium">${escapeHTML(sn.header)}</span>
+            <button class="copy-btn ml-auto" onclick="copyText(decodeURIComponent('${encURI(sn.header)}'), this)" title="Copy header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Header
+            </button>
+            <button class="copy-btn" onclick="copyAllByIndex('snippet-values', ${ext.snippets.indexOf(sn)}, this)" title="Copy tất cả values">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              All values
+            </button>
+          </div>
+          <div class="pl-7 flex flex-wrap gap-1">
+            ${values.map(v => `<span class="chip chip-info cursor-pointer hover:bg-blue-200" onclick="copyText(decodeURIComponent('${encURI(v)}'), this)">${escapeHTML(v)}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('quickPasteContent').innerHTML = html;
+}
+
+// ============ INIT ============
+function init() {
+  loadSettings();
+  loadData();
+  if (STATE.campaigns.length === 0) {
+    showEmptyState();
+  } else {
+    const firstCamp = STATE.campaigns[0];
+    loadCampaign(firstCamp.id);
+    if (firstCamp.adGroups.length > 0) loadAdGroup(firstCamp.adGroups[0].id);
+  }
+  renderSidebar();
+  rebuildUTM();
+}
+
+// ============ SETTINGS ============
+function loadSettings() {
+  const s = localStorage.getItem('rsa2_settings');
+  if (s) STATE.settings = { ...STATE.settings, ...JSON.parse(s) };
+}
+function openSettings() {
+  document.getElementById('apiKeyInput').value = STATE.settings.apiKey || '';
+  document.getElementById('modelSelect').value = STATE.settings.model || 'deepseek/deepseek-chat-v3.1:free';
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+function saveSettings() {
+  STATE.settings.apiKey = document.getElementById('apiKeyInput').value.trim();
+  STATE.settings.model = document.getElementById('modelSelect').value;
+  localStorage.setItem('rsa2_settings', JSON.stringify(STATE.settings));
+  closeSettings();
+  toast('✓ Settings saved');
+}
+function clearAllData() {
+  if (!confirm('Xóa TOÀN BỘ campaigns, ad groups, settings? Không thể undo.')) return;
+  localStorage.removeItem('rsa2_campaigns');
+  localStorage.removeItem('rsa2_settings');
+  location.reload();
+}
+
+// ============ DATA ============
+function loadData() {
+  const d = localStorage.getItem('rsa2_campaigns');
+  STATE.campaigns = d ? JSON.parse(d) : [];
+}
+function saveData() {
+  localStorage.setItem('rsa2_campaigns', JSON.stringify(STATE.campaigns));
+}
+
+// ============ HELPERS ============
+function activeCampaign() { return STATE.campaigns.find(c => c.id === STATE.activeCampaignId); }
+function activeAdGroup() {
+  const c = activeCampaign();
+  if (!c) return null;
+  return c.adGroups.find(g => g.id === STATE.activeAdGroupId);
+}
+
+// ============ CAMPAIGN ============
+function newCampaign() {
+  const id = 'c_' + Date.now();
+  const camp = {
+    id,
+    name: 'Campaign ' + (STATE.campaigns.length + 1),
+    url: '',
+    utm: { source:'google', medium:'cpc', campaign:'{campaignname}', campaignCustom:'', content:'{adgroupname}', term:'{keyword}', extra:'' },
+    extensions: { sitelinks:[], callouts:[], snippets:[] },
+    adGroups: []
+  };
+  STATE.campaigns.push(camp);
+  saveData();
+  loadCampaign(id);
+  newAdGroup();
+  renderSidebar();
+}
+function loadCampaign(id) {
+  const c = STATE.campaigns.find(x => x.id === id);
+  if (!c) return;
+  STATE.activeCampaignId = id;
+  STATE.activeAdGroupId = c.adGroups[0]?.id || null;
+
+  document.getElementById('campName').value = c.name || '';
+  document.getElementById('campURL').value = c.url || '';
+  // UTM
+  document.getElementById('utmSource').value = c.utm.source || 'google';
+  document.getElementById('utmMedium').value = c.utm.medium || 'cpc';
+  document.getElementById('utmCampaign').value = c.utm.campaign || '{campaignname}';
+  document.getElementById('utmCampaignCustom').value = c.utm.campaignCustom || '';
+  document.getElementById('utmCampaignCustom').classList.toggle('hidden', c.utm.campaign !== 'custom');
+  document.getElementById('utmContent').value = c.utm.content || '{adgroupname}';
+  document.getElementById('utmTerm').value = c.utm.term || '{keyword}';
+  document.getElementById('utmExtra').value = c.utm.extra || '';
+
+  renderAdGroupTabs();
+  if (STATE.activeAdGroupId) loadAdGroup(STATE.activeAdGroupId);
+  else {
+    document.getElementById('adGroupPanel').classList.add('hidden');
+  }
+  showCampaignView();
+  renderSidebar();
+  renderExtensions();
+  rebuildUTM();
+  updateBreadcrumb();
+}
+function deleteCampaign(id) {
+  if (!confirm('Xóa campaign này và toàn bộ ad groups bên trong?')) return;
+  STATE.campaigns = STATE.campaigns.filter(x => x.id !== id);
+  saveData();
+  if (STATE.campaigns.length === 0) { showEmptyState(); STATE.activeCampaignId = null; }
+  else loadCampaign(STATE.campaigns[0].id);
+  renderSidebar();
+}
+
+// ============ AD GROUP ============
+function newAdGroup() {
+  const c = activeCampaign();
+  if (!c) return;
+  const id = 'g_' + Date.now();
+  const ag = {
+    id,
+    name: 'Ad Group ' + (c.adGroups.length + 1),
+    theme: '',
+    keywords: '',
+    usp: '',
+    offer: '',
+    tone: 'professional',
+    lang: 'english',
+    url: '',
+    path1: '',
+    path2: '',
+    headlines: [],
+    descriptions: [],
+    extensions: { sitelinks:[], callouts:[], snippets:[], override: false }
+  };
+  c.adGroups.push(ag);
+  saveData();
+  loadAdGroup(id);
+  renderAdGroupTabs();
+  renderSidebar();
+}
+function loadAdGroup(id) {
+  const c = activeCampaign();
+  if (!c) return;
+  const ag = c.adGroups.find(x => x.id === id);
+  if (!ag) return;
+  STATE.activeAdGroupId = id;
+
+  document.getElementById('agName').value = ag.name || '';
+  document.getElementById('agTheme').value = ag.theme || '';
+  document.getElementById('agKeywords').value = ag.keywords || '';
+  document.getElementById('agUSP').value = ag.usp || '';
+  document.getElementById('agOffer').value = ag.offer || '';
+  document.getElementById('agTone').value = ag.tone || 'professional';
+  document.getElementById('agLang').value = ag.lang || 'english';
+  document.getElementById('agURL').value = ag.url || '';
+  document.getElementById('agPath1').value = ag.path1 || '';
+  document.getElementById('agPath2').value = ag.path2 || '';
+
+  document.getElementById('adGroupPanel').classList.remove('hidden');
+  renderHeadlines();
+  renderDescriptions();
+  renderStrength();
+  renderAdGroupTabs();
+  renderSidebar();
+  renderExtensions();
+  updateBreadcrumb();
+}
+function deleteAdGroup() {
+  const c = activeCampaign();
+  if (!c || !STATE.activeAdGroupId) return;
+  if (!confirm('Xóa ad group này?')) return;
+  c.adGroups = c.adGroups.filter(x => x.id !== STATE.activeAdGroupId);
+  saveData();
+  if (c.adGroups.length > 0) loadAdGroup(c.adGroups[0].id);
+  else { STATE.activeAdGroupId = null; document.getElementById('adGroupPanel').classList.add('hidden'); renderAdGroupTabs(); }
+  renderSidebar();
+}
+function duplicateAdGroup() {
+  const c = activeCampaign();
+  const ag = activeAdGroup();
+  if (!c || !ag) return;
+  const dup = JSON.parse(JSON.stringify(ag));
+  dup.id = 'g_' + Date.now();
+  dup.name = ag.name + ' (copy)';
+  c.adGroups.push(dup);
+  saveData();
+  loadAdGroup(dup.id);
+  renderAdGroupTabs();
+  renderSidebar();
+  toast('✓ Đã duplicate ad group');
+}
+
+function saveCurrent() {
+  const c = activeCampaign();
+  if (!c) return;
+  c.name = document.getElementById('campName').value || 'Untitled campaign';
+  c.url = document.getElementById('campURL').value;
+  const ag = activeAdGroup();
+  if (ag) {
+    ag.name = document.getElementById('agName').value || 'Untitled ad group';
+    ag.theme = document.getElementById('agTheme').value;
+    ag.keywords = document.getElementById('agKeywords').value;
+    ag.usp = document.getElementById('agUSP').value;
+    ag.offer = document.getElementById('agOffer').value;
+    ag.tone = document.getElementById('agTone').value;
+    ag.lang = document.getElementById('agLang').value;
+    ag.url = document.getElementById('agURL').value;
+    ag.path1 = document.getElementById('agPath1').value;
+    ag.path2 = document.getElementById('agPath2').value;
+  }
+  saveData();
+  renderSidebar();
+  renderAdGroupTabs();
+  renderStrength();
+  updateBreadcrumb();
+}
+
+// ============ SIDEBAR ============
+function renderSidebar() {
+  const el = document.getElementById('campaignList');
+  if (STATE.campaigns.length === 0) {
+    el.innerHTML = '<div class="text-xs text-gray-400 text-center py-8">Chưa có campaign</div>';
+    return;
+  }
+  el.innerHTML = STATE.campaigns.map(c => `
+    <div class="mb-1">
+      <div class="side-campaign ${c.id === STATE.activeCampaignId ? 'active' : ''}" onclick="loadCampaign('${c.id}')">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" class="flex-shrink-0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span class="text-sm font-medium truncate">${escapeHTML(c.name)}</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-[10px] text-gray-400">${c.adGroups.length}</span>
+            ${c.id === STATE.activeCampaignId ? `<button onclick="event.stopPropagation(); deleteCampaign('${c.id}')" class="text-gray-400 hover:text-red-600 text-xs">✕</button>` : ''}
+          </div>
+        </div>
+      </div>
+      ${c.id === STATE.activeCampaignId ? c.adGroups.map(g => `
+        <div class="side-adgroup ${g.id === STATE.activeAdGroupId ? 'active' : ''}" onclick="loadAdGroup('${g.id}')">
+          <div class="flex items-center gap-1.5">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12" style="display:${g.headlines.length >= 3 ? 'inline' : 'none'}"/><circle cx="12" cy="12" r="3" style="display:${g.headlines.length < 3 ? 'inline' : 'none'}"/></svg>
+            <span class="truncate">${escapeHTML(g.name)}</span>
+          </div>
+        </div>
+      `).join('') : ''}
+    </div>
+  `).join('');
+}
+
+// ============ AD GROUP TABS ============
+function renderAdGroupTabs() {
+  const c = activeCampaign();
+  if (!c) return;
+  const el = document.getElementById('adGroupTabs');
+  document.getElementById('adGroupCount').textContent = `(${c.adGroups.length})`;
+  if (c.adGroups.length === 0) {
+    el.innerHTML = '<div class="text-xs text-gray-400 italic">Chưa có ad group nào. Click "+ Add ad group" để tạo.</div>';
+    return;
+  }
+  el.innerHTML = c.adGroups.map(g => {
+    const strength = calcAdStrengthFor(g);
+    const dotColor = strength.score >= 65 ? 'bg-green-500' : strength.score >= 40 ? 'bg-amber-500' : strength.score > 0 ? 'bg-red-500' : 'bg-gray-300';
+    return `
+      <button onclick="loadAdGroup('${g.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium ${g.id === STATE.activeAdGroupId ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}">
+        <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+        ${escapeHTML(g.name)}
+      </button>
+    `;
+  }).join('');
+}
+
+// ============ BREADCRUMB ============
+function updateBreadcrumb() {
+  const c = activeCampaign();
+  const ag = activeAdGroup();
+  const el = document.getElementById('topBreadcrumb');
+  if (!c) { el.textContent = 'Chưa chọn campaign'; return; }
+  let s = `<span class="text-gray-400">Campaigns</span> › <span class="text-gray-900 font-medium">${escapeHTML(c.name)}</span>`;
+  if (ag) s += ` › <span class="text-blue-600 font-medium">${escapeHTML(ag.name)}</span>`;
+  el.innerHTML = s;
+}
+
+// ============ VIEWS ============
+function showEmptyState() {
+  document.getElementById('emptyState').classList.remove('hidden');
+  document.getElementById('emptyState').classList.add('flex');
+  document.getElementById('campaignView').classList.add('hidden');
+}
+function showCampaignView() {
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('emptyState').classList.remove('flex');
+  document.getElementById('campaignView').classList.remove('hidden');
+}
+function switchView(v) {
+  STATE.currentView = v;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+  ['creative','extensions','tracking','preview','analytics'].forEach(x => {
+    document.getElementById('view-'+x).classList.toggle('hidden', x !== v);
+  });
+  if (v === 'preview') renderPreview();
+  if (v === 'tracking') rebuildUTM();
+  if (v === 'extensions') renderExtensions();
+  if (v === 'analytics') renderAnalytics();
+}
+
+// ============ HEADLINES / DESCRIPTIONS ============
+function addHeadline() {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (ag.headlines.length >= 15) { toast('Đã tối đa 15 headlines'); return; }
+  ag.headlines.push({ text:'', pinned:null });
+  saveData(); renderHeadlines(); renderStrength();
+}
+function addDescription() {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (ag.descriptions.length >= 4) { toast('Đã tối đa 4 descriptions'); return; }
+  ag.descriptions.push({ text:'', pinned:null });
+  saveData(); renderDescriptions(); renderStrength();
+}
+function removeAsset(type, idx) {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (type === 'h') ag.headlines.splice(idx, 1);
+  else ag.descriptions.splice(idx, 1);
+  saveData(); renderHeadlines(); renderDescriptions(); renderStrength(); renderAdGroupTabs(); renderSidebar();
+}
+function updateAsset(type, idx, text) {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (type === 'h') ag.headlines[idx].text = text;
+  else ag.descriptions[idx].text = text;
+  saveData(); renderStrength(); renderAdGroupTabs(); renderSidebar();
+  // update counters and validation inline
+  if (type === 'h') renderHeadlineMeta(idx);
+  else renderDescriptionMeta(idx);
+}
+function updatePin(type, idx, pos) {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  const v = pos === '' ? null : parseInt(pos);
+  if (type === 'h') ag.headlines[idx].pinned = v;
+  else ag.descriptions[idx].pinned = v;
+  saveData(); renderStrength();
+}
+
+// Validation
+function validateHeadline(text, idx) {
+  const ag = activeAdGroup();
+  const errors=[], warnings=[];
+  if (!text || !text.trim()) return { errors, warnings };
+  if (text.length > 30) errors.push(`Quá ${text.length-30} ký tự`);
+  if (text === text.toUpperCase() && /[A-Z]{3,}/.test(text)) warnings.push('HOA toàn bộ');
+  if ((text.match(/!/g) || []).length > 1) errors.push('Nhiều dấu !');
+  if (text.trim().endsWith('!')) warnings.push('Tránh kết bằng !');
+  if (/[!?]{2,}/.test(text)) errors.push('Trùng dấu câu');
+  if (/  +/.test(text)) warnings.push('Space thừa');
+  if (ag) {
+    const dupes = ag.headlines.filter((h,i)=>i!==idx && h.text.trim().toLowerCase()===text.trim().toLowerCase()).length;
+    if (dupes>0) errors.push('Trùng');
+  }
+  return { errors, warnings };
+}
+function validateDescription(text, idx) {
+  const ag = activeAdGroup();
+  const errors=[], warnings=[];
+  if (!text || !text.trim()) return { errors, warnings };
+  if (text.length > 90) errors.push(`Quá ${text.length-90} ký tự`);
+  if (text === text.toUpperCase() && text.length > 5) warnings.push('HOA toàn bộ');
+  if (/[!?]{2,}/.test(text)) errors.push('Trùng dấu câu');
+  if (ag) {
+    const dupes = ag.descriptions.filter((d,i)=>i!==idx && d.text.trim().toLowerCase()===text.trim().toLowerCase()).length;
+    if (dupes>0) errors.push('Trùng');
+  }
+  return { errors, warnings };
+}
+
+function renderHeadlines() {
+  const ag = activeAdGroup();
+  const el = document.getElementById('headlinesList');
+  document.getElementById('hCount').textContent = `${ag?.headlines.length || 0}/15`;
+  if (!ag || ag.headlines.length === 0) {
+    el.innerHTML = '<div class="text-center py-6 text-gray-400 text-xs border-2 border-dashed border-gray-200 rounded-lg">Chưa có headline. Dùng <strong>✨ AI Gen</strong> hoặc thêm tay.</div>';
+    return;
+  }
+  el.innerHTML = ag.headlines.map((h,i)=>headlineRowHTML(h,i)).join('');
+}
+function headlineRowHTML(h, i) {
+  const { errors, warnings } = validateHeadline(h.text, i);
+  const len = h.text.length;
+  const lenColor = len > 30 ? 'text-red-600' : len > 25 ? 'text-amber-600' : 'text-gray-400';
+  const borderColor = errors.length ? 'border-red-300 bg-red-50/50' : warnings.length ? 'border-amber-300 bg-amber-50/50' : 'border-gray-200';
+  const hasText = h.text.trim();
+  return `
+    <div class="asset-row border ${borderColor} rounded-lg p-2" id="h-row-${i}">
+      <div class="flex items-start gap-2">
+        <span class="text-[10px] text-gray-400 font-mono mt-2 w-5 flex-shrink-0">${i+1}</span>
+        <div class="flex-1 min-w-0">
+          <input type="text" value="${escapeAttr(h.text)}" oninput="updateAsset('h',${i},this.value)" maxlength="50" class="w-full px-2 py-1.5 border border-gray-200 rounded text-sm" placeholder="Headline ${i+1}">
+          <div class="flex items-center gap-1.5 mt-1 flex-wrap" id="h-meta-${i}">
+            <span class="text-[10px] ${lenColor} font-mono">${len}/30</span>
+            <select onchange="updatePin('h',${i},this.value)" class="text-[10px] border border-gray-200 rounded px-1 py-0">
+              <option value="" ${h.pinned===null?'selected':''}>Unpinned</option>
+              <option value="1" ${h.pinned===1?'selected':''}>Pin 1</option>
+              <option value="2" ${h.pinned===2?'selected':''}>Pin 2</option>
+              <option value="3" ${h.pinned===3?'selected':''}>Pin 3</option>
+            </select>
+            ${errors.map(e=>`<span class="chip chip-err">${e}</span>`).join('')}
+            ${warnings.map(w=>`<span class="chip chip-warn">${w}</span>`).join('')}
+            ${errors.length===0 && warnings.length===0 && h.text ? '<span class="chip chip-ok">OK</span>' : ''}
+          </div>
+        </div>
+        ${hasText ? `<button class="copy-btn mt-1" onclick="copyText(decodeURIComponent('${encURI(h.text)}'), this)" title="Copy headline này">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>` : ''}
+        <button onclick="removeAsset('h',${i})" class="text-gray-400 hover:text-red-600 text-xs mt-1.5">✕</button>
+      </div>
+    </div>
+  `;
+}
+function renderHeadlineMeta(i) {
+  const ag = activeAdGroup();
+  if (!ag || !ag.headlines[i]) return;
+  const h = ag.headlines[i];
+  const row = document.getElementById(`h-row-${i}`);
+  if (!row) return;
+  // Update border color
+  const { errors, warnings } = validateHeadline(h.text, i);
+  row.className = `asset-row border ${errors.length ? 'border-red-300 bg-red-50/50' : warnings.length ? 'border-amber-300 bg-amber-50/50' : 'border-gray-200'} rounded-lg p-2`;
+  // Update meta
+  const len = h.text.length;
+  const lenColor = len > 30 ? 'text-red-600' : len > 25 ? 'text-amber-600' : 'text-gray-400';
+  const meta = document.getElementById(`h-meta-${i}`);
+  if (!meta) return;
+  meta.innerHTML = `
+    <span class="text-[10px] ${lenColor} font-mono">${len}/30</span>
+    <select onchange="updatePin('h',${i},this.value)" class="text-[10px] border border-gray-200 rounded px-1 py-0">
+      <option value="" ${h.pinned===null?'selected':''}>Unpinned</option>
+      <option value="1" ${h.pinned===1?'selected':''}>Pin 1</option>
+      <option value="2" ${h.pinned===2?'selected':''}>Pin 2</option>
+      <option value="3" ${h.pinned===3?'selected':''}>Pin 3</option>
+    </select>
+    ${errors.map(e=>`<span class="chip chip-err">${e}</span>`).join('')}
+    ${warnings.map(w=>`<span class="chip chip-warn">${w}</span>`).join('')}
+    ${errors.length===0 && warnings.length===0 && h.text ? '<span class="chip chip-ok">OK</span>' : ''}
+  `;
+}
+
+function renderDescriptions() {
+  const ag = activeAdGroup();
+  const el = document.getElementById('descriptionsList');
+  document.getElementById('dCount').textContent = `${ag?.descriptions.length || 0}/4`;
+  if (!ag || ag.descriptions.length === 0) {
+    el.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs border-2 border-dashed border-gray-200 rounded-lg">Chưa có description</div>';
+    return;
+  }
+  el.innerHTML = ag.descriptions.map((d,i)=>descriptionRowHTML(d,i)).join('');
+}
+function descriptionRowHTML(d, i) {
+  const { errors, warnings } = validateDescription(d.text, i);
+  const len = d.text.length;
+  const lenColor = len > 90 ? 'text-red-600' : len > 80 ? 'text-amber-600' : 'text-gray-400';
+  const borderColor = errors.length ? 'border-red-300 bg-red-50/50' : warnings.length ? 'border-amber-300 bg-amber-50/50' : 'border-gray-200';
+  const hasText = d.text.trim();
+  return `
+    <div class="asset-row border ${borderColor} rounded-lg p-2" id="d-row-${i}">
+      <div class="flex items-start gap-2">
+        <span class="text-[10px] text-gray-400 font-mono mt-2 w-5 flex-shrink-0">${i+1}</span>
+        <div class="flex-1 min-w-0">
+          <textarea oninput="updateAsset('d',${i},this.value)" rows="2" maxlength="150" class="w-full px-2 py-1.5 border border-gray-200 rounded text-sm resize-none" placeholder="Description ${i+1}">${escapeHTML(d.text)}</textarea>
+          <div class="flex items-center gap-1.5 mt-1 flex-wrap" id="d-meta-${i}">
+            <span class="text-[10px] ${lenColor} font-mono">${len}/90</span>
+            <select onchange="updatePin('d',${i},this.value)" class="text-[10px] border border-gray-200 rounded px-1 py-0">
+              <option value="" ${d.pinned===null?'selected':''}>Unpinned</option>
+              <option value="1" ${d.pinned===1?'selected':''}>Pin 1</option>
+              <option value="2" ${d.pinned===2?'selected':''}>Pin 2</option>
+            </select>
+            ${errors.map(e=>`<span class="chip chip-err">${e}</span>`).join('')}
+            ${warnings.map(w=>`<span class="chip chip-warn">${w}</span>`).join('')}
+            ${errors.length===0 && warnings.length===0 && d.text ? '<span class="chip chip-ok">OK</span>' : ''}
+          </div>
+        </div>
+        ${hasText ? `<button class="copy-btn mt-1" onclick="copyText(decodeURIComponent('${encURI(d.text)}'), this)" title="Copy description này">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>` : ''}
+        <button onclick="removeAsset('d',${i})" class="text-gray-400 hover:text-red-600 text-xs mt-1.5">✕</button>
+      </div>
+    </div>
+  `;
+}
+function renderDescriptionMeta(i) {
+  const ag = activeAdGroup();
+  if (!ag || !ag.descriptions[i]) return;
+  const d = ag.descriptions[i];
+  const row = document.getElementById(`d-row-${i}`);
+  if (!row) return;
+  const { errors, warnings } = validateDescription(d.text, i);
+  row.className = `asset-row border ${errors.length ? 'border-red-300 bg-red-50/50' : warnings.length ? 'border-amber-300 bg-amber-50/50' : 'border-gray-200'} rounded-lg p-2`;
+  const len = d.text.length;
+  const lenColor = len > 90 ? 'text-red-600' : len > 80 ? 'text-amber-600' : 'text-gray-400';
+  const meta = document.getElementById(`d-meta-${i}`);
+  if (!meta) return;
+  meta.innerHTML = `
+    <span class="text-[10px] ${lenColor} font-mono">${len}/90</span>
+    <select onchange="updatePin('d',${i},this.value)" class="text-[10px] border border-gray-200 rounded px-1 py-0">
+      <option value="" ${d.pinned===null?'selected':''}>Unpinned</option>
+      <option value="1" ${d.pinned===1?'selected':''}>Pin 1</option>
+      <option value="2" ${d.pinned===2?'selected':''}>Pin 2</option>
+    </select>
+    ${errors.map(e=>`<span class="chip chip-err">${e}</span>`).join('')}
+    ${warnings.map(w=>`<span class="chip chip-warn">${w}</span>`).join('')}
+    ${errors.length===0 && warnings.length===0 && d.text ? '<span class="chip chip-ok">OK</span>' : ''}
+  `;
+}
+
+// ============ AD STRENGTH ============
+function calcAdStrengthFor(ag) {
+  if (!ag) return { score:0, label:'—', color:'#9ca3af', tips:[] };
+  const vH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
+  const vD = ag.descriptions.filter(d=>d.text.trim() && d.text.length<=90);
+  const hCount = vH.length, dCount = vD.length;
+  let score = 0;
+  const tips = [];
+
+  if (hCount >= 15) score += 25;
+  else if (hCount >= 11) score += 20;
+  else if (hCount >= 8) score += 15;
+  else if (hCount >= 5) score += 8;
+  else if (hCount >= 3) score += 3;
+  if (hCount < 8) tips.push({type:'warn',text:`Thêm headlines (${hCount}/8 tối thiểu)`});
+  else if (hCount < 15) tips.push({type:'tip',text:`+${15-hCount} headlines nữa để Excellent`});
+
+  if (dCount >= 4) score += 15;
+  else if (dCount >= 3) score += 10;
+  else if (dCount >= 2) score += 5;
+  if (dCount < 4) tips.push({type:'warn',text:`Thêm descriptions (${dCount}/4)`});
+
+  const uniqueH = new Set(vH.map(h=>h.text.trim().toLowerCase())).size;
+  if (hCount > 0) {
+    const ratio = uniqueH / hCount;
+    score += Math.round(ratio * 15);
+    if (ratio < 0.9) tips.push({type:'err',text:'Có headlines trùng — xóa duplicate'});
+  }
+
+  if (hCount >= 3) {
+    const wordSets = vH.map(h=>new Set(h.text.toLowerCase().split(/\s+/).filter(w=>w.length>3)));
+    let overlap=0, pairs=0;
+    for (let i=0;i<wordSets.length;i++) for (let j=i+1;j<wordSets.length;j++) {
+      const inter = [...wordSets[i]].filter(x=>wordSets[j].has(x)).length;
+      const uni = new Set([...wordSets[i],...wordSets[j]]).size;
+      if (uni>0) { overlap += inter/uni; pairs++; }
+    }
+    const avg = pairs>0 ? overlap/pairs : 0;
+    if (avg < 0.3) score += 10;
+    else if (avg < 0.5) score += 5;
+    else tips.push({type:'warn',text:'Headlines lặp từ nhiều — đa dạng messaging'});
+  }
+
+  const keywords = (ag.keywords || '').toLowerCase().split('\n').map(k=>k.trim()).filter(Boolean);
+  if (keywords.length > 0 && hCount > 0) {
+    const withKW = vH.filter(h=>keywords.some(k=>h.text.toLowerCase().includes(k))).length;
+    const ratio = withKW/hCount;
+    score += Math.round(ratio * 20);
+    if (ratio < 0.3) tips.push({type:'warn',text:'Ít headlines chứa keyword chính'});
+  }
+
+  const pinnedCount = vH.filter(h=>h.pinned!==null).length;
+  if (pinnedCount > 3) tips.push({type:'warn',text:'Pin quá nhiều giảm Ad Strength'});
+
+  if (hCount > 0) {
+    const avgLen = vH.reduce((s,h)=>s+h.text.length,0) / hCount;
+    if (avgLen >= 22) score += 5;
+    else if (avgLen < 15) tips.push({type:'tip',text:'Tận dụng 25-30 ký tự headlines'});
+  }
+
+  score = Math.min(100, Math.max(0, score));
+  let label, color;
+  if (score >= 85) { label='Excellent'; color='#16a34a'; }
+  else if (score >= 65) { label='Good'; color='#65a30d'; }
+  else if (score >= 40) { label='Average'; color='#d97706'; }
+  else if (score >= 20) { label='Poor'; color='#dc2626'; }
+  else { label='Incomplete'; color='#6b7280'; }
+  return { score, label, color, tips };
+}
+function renderStrength() {
+  const ag = activeAdGroup();
+  const { score, label, color, tips } = calcAdStrengthFor(ag);
+  document.getElementById('strengthLabel').textContent = label;
+  document.getElementById('strengthLabel').style.color = color;
+  document.getElementById('strengthScore').textContent = `${score}/100`;
+  document.getElementById('strengthFill').style.width = score+'%';
+  document.getElementById('strengthFill').style.background = color;
+  const tipsEl = document.getElementById('strengthTips');
+  if (!tips.length) {
+    tipsEl.innerHTML = '<div class="text-xs text-green-700 bg-green-50 px-2 py-1.5 rounded flex items-center gap-1">✓ Creative sẵn sàng</div>';
+  } else {
+    tipsEl.innerHTML = tips.map(t=>{
+      const cls = t.type==='err'?'text-red-700 bg-red-50':t.type==='warn'?'text-amber-700 bg-amber-50':'text-blue-700 bg-blue-50';
+      const icon = t.type==='err'?'✗':t.type==='warn'?'!':'→';
+      return `<div class="${cls} px-2 py-1 rounded text-xs flex items-start gap-1"><span class="font-bold">${icon}</span><span>${t.text}</span></div>`;
+    }).join('');
+  }
+}
+
+// ============ EXTENSIONS ============
+function setExtScope(scope) {
+  STATE.extScope = scope;
+  document.getElementById('scopeCampaign').className = scope==='campaign' ? 'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm' : 'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  document.getElementById('scopeAdgroup').className = scope==='adgroup' ? 'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm' : 'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  renderExtensions();
+}
+function currentExtObj() {
+  if (STATE.extScope === 'campaign') return activeCampaign()?.extensions;
+  return activeAdGroup()?.extensions;
+}
+function renderExtensions() {
+  const ag = activeAdGroup(), c = activeCampaign();
+  const label = STATE.extScope === 'campaign'
+    ? (c ? `Campaign: ${c.name}` : '')
+    : (ag ? `Ad Group: ${ag.name}` : '');
+  document.getElementById('scopeLabel').textContent = label;
+  renderSitelinks();
+  renderCallouts();
+  renderSnippets();
+}
+
+// Sitelinks
+function addSitelink() {
+  const ext = currentExtObj();
+  if (!ext) return;
+  if (ext.sitelinks.length >= 8) { toast('Tối đa 8 sitelinks'); return; }
+  ext.sitelinks.push({ text:'', desc1:'', desc2:'', url:'' });
+  saveData(); renderSitelinks();
+}
+function removeSitelink(i) {
+  const ext = currentExtObj();
+  if (!ext) return;
+  ext.sitelinks.splice(i, 1);
+  saveData(); renderSitelinks();
+}
+function updateSitelink(i, field, val) {
+  const ext = currentExtObj();
+  if (!ext || !ext.sitelinks[i]) return;
+  ext.sitelinks[i][field] = val;
+  saveData(); renderSitelinkMeta(i);
+}
+function renderSitelinks() {
+  const ext = currentExtObj();
+  const el = document.getElementById('sitelinksList');
+  if (!ext) { el.innerHTML='<div class="text-xs text-gray-400 italic">Chọn ad group trước</div>'; return; }
+  document.getElementById('slCount').textContent = `${ext.sitelinks.length}/8`;
+  if (ext.sitelinks.length === 0) {
+    el.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Chưa có sitelink</div>';
+    return;
+  }
+  el.innerHTML = ext.sitelinks.map((s,i)=>{
+    const textLen = s.text.length;
+    const desc1Len = s.desc1.length;
+    const desc2Len = s.desc2.length;
+    const textErr = textLen > 25;
+    const hasAny = s.text.trim();
+    return `
+      <div class="border ${textErr?'border-red-300':'border-gray-200'} rounded-lg p-2 asset-row">
+        <div class="flex items-start gap-2">
+          <span class="text-[10px] text-gray-400 font-mono mt-2">${i+1}</span>
+          <div class="flex-1 space-y-1.5">
+            <div class="flex items-center gap-1.5">
+              <input type="text" value="${escapeAttr(s.text)}" oninput="updateSitelink(${i},'text',this.value)" maxlength="40" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm" placeholder="Link text (25 ký tự)">
+              ${hasAny ? `<button class="copy-btn" onclick="copyText(decodeURIComponent('${encURI(s.text)}'), this)" title="Copy link text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>` : ''}
+            </div>
+            <div class="flex justify-between text-[10px]" id="sl-meta-${i}">
+              <span class="${textLen>25?'text-red-600':textLen>20?'text-amber-600':'text-gray-400'} font-mono">${textLen}/25</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="text" value="${escapeAttr(s.url)}" oninput="updateSitelink(${i},'url',this.value)" class="flex-1 px-2 py-1 border border-gray-200 rounded text-xs font-mono" placeholder="https://example.com/page">
+              ${s.url ? `<button class="copy-btn" onclick="copyText(decodeURIComponent('${encURI(s.url)}'), this)" title="Copy URL">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>` : ''}
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <div>
+                <div class="flex items-center gap-1">
+                  <input type="text" value="${escapeAttr(s.desc1)}" oninput="updateSitelink(${i},'desc1',this.value)" maxlength="50" class="flex-1 px-2 py-1 border border-gray-200 rounded text-xs" placeholder="Desc line 1 (35)">
+                  ${s.desc1 ? `<button class="copy-btn" onclick="copyText(decodeURIComponent('${encURI(s.desc1)}'), this)" title="Copy desc 1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>` : ''}
+                </div>
+                <div class="text-[10px] ${desc1Len>35?'text-red-600':'text-gray-400'} font-mono">${desc1Len}/35</div>
+              </div>
+              <div>
+                <div class="flex items-center gap-1">
+                  <input type="text" value="${escapeAttr(s.desc2)}" oninput="updateSitelink(${i},'desc2',this.value)" maxlength="50" class="flex-1 px-2 py-1 border border-gray-200 rounded text-xs" placeholder="Desc line 2 (35)">
+                  ${s.desc2 ? `<button class="copy-btn" onclick="copyText(decodeURIComponent('${encURI(s.desc2)}'), this)" title="Copy desc 2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>` : ''}
+                </div>
+                <div class="text-[10px] ${desc2Len>35?'text-red-600':'text-gray-400'} font-mono">${desc2Len}/35</div>
+              </div>
+            </div>
+          </div>
+          <button onclick="removeSitelink(${i})" class="text-gray-400 hover:text-red-600 text-xs mt-1">✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function renderSitelinkMeta(i) { renderSitelinks(); }
+
+// Callouts
+function addCallout() {
+  const ext = currentExtObj();
+  if (!ext) return;
+  if (ext.callouts.length >= 10) { toast('Tối đa 10 callouts'); return; }
+  ext.callouts.push({ text:'' });
+  saveData(); renderCallouts();
+}
+function removeCallout(i) {
+  const ext = currentExtObj();
+  if (!ext) return;
+  ext.callouts.splice(i, 1);
+  saveData(); renderCallouts();
+}
+function updateCallout(i, val) {
+  const ext = currentExtObj();
+  if (!ext || !ext.callouts[i]) return;
+  ext.callouts[i].text = val;
+  saveData();
+  // update counter
+  const el = document.getElementById(`co-count-${i}`);
+  if (el) {
+    const l = val.length;
+    el.textContent = `${l}/25`;
+    el.className = `text-[10px] font-mono ${l>25?'text-red-600':l>20?'text-amber-600':'text-gray-400'}`;
+  }
+}
+function renderCallouts() {
+  const ext = currentExtObj();
+  const el = document.getElementById('calloutsList');
+  if (!ext) { el.innerHTML='<div class="text-xs text-gray-400 italic">Chọn ad group</div>'; return; }
+  document.getElementById('coCount').textContent = `${ext.callouts.length}/10`;
+  if (ext.callouts.length === 0) {
+    el.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Chưa có callout</div>';
+    return;
+  }
+  el.innerHTML = ext.callouts.map((co,i)=>{
+    const l = co.text.length;
+    const hasText = co.text.trim();
+    return `
+      <div class="flex items-center gap-2 border ${l>25?'border-red-300':'border-gray-200'} rounded-lg p-2 asset-row">
+        <span class="text-[10px] text-gray-400 font-mono w-5">${i+1}</span>
+        <input type="text" value="${escapeAttr(co.text)}" oninput="updateCallout(${i},this.value)" maxlength="40" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm" placeholder="VD: Free shipping, 24/7 support">
+        <span id="co-count-${i}" class="text-[10px] font-mono ${l>25?'text-red-600':l>20?'text-amber-600':'text-gray-400'}">${l}/25</span>
+        ${hasText ? `<button class="copy-btn" onclick="copyText(decodeURIComponent('${encURI(co.text)}'), this)" title="Copy callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>` : ''}
+        <button onclick="removeCallout(${i})" class="text-gray-400 hover:text-red-600 text-xs">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// Structured snippets
+function addSnippet() {
+  const ext = currentExtObj();
+  if (!ext) return;
+  ext.snippets.push({ header:'Services', values:['',''] });
+  saveData(); renderSnippets();
+}
+function removeSnippet(i) {
+  const ext = currentExtObj();
+  if (!ext) return;
+  ext.snippets.splice(i, 1);
+  saveData(); renderSnippets();
+}
+function updateSnippetHeader(i, val) {
+  const ext = currentExtObj();
+  if (!ext || !ext.snippets[i]) return;
+  ext.snippets[i].header = val;
+  saveData();
+}
+function updateSnippetValue(i, vi, val) {
+  const ext = currentExtObj();
+  if (!ext || !ext.snippets[i]) return;
+  ext.snippets[i].values[vi] = val;
+  saveData();
+}
+function addSnippetValue(i) {
+  const ext = currentExtObj();
+  if (!ext || !ext.snippets[i]) return;
+  if (ext.snippets[i].values.length >= 10) { toast('Tối đa 10 values'); return; }
+  ext.snippets[i].values.push('');
+  saveData(); renderSnippets();
+}
+function removeSnippetValue(i, vi) {
+  const ext = currentExtObj();
+  if (!ext || !ext.snippets[i]) return;
+  if (ext.snippets[i].values.length <= 3) { toast('Tối thiểu 3 values'); return; }
+  ext.snippets[i].values.splice(vi, 1);
+  saveData(); renderSnippets();
+}
+function renderSnippets() {
+  const ext = currentExtObj();
+  const el = document.getElementById('snippetsList');
+  if (!ext) { el.innerHTML='<div class="text-xs text-gray-400 italic">Chọn ad group</div>'; return; }
+  document.getElementById('ssCount').textContent = `${ext.snippets.length}`;
+  if (ext.snippets.length === 0) {
+    el.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Chưa có structured snippet</div>';
+    return;
+  }
+  const validHeaders = ['Amenities','Brands','Courses','Degree programs','Destinations','Featured hotels','Insurance coverage','Models','Neighborhoods','Service catalog','Shows','Styles','Types','Services','Products'];
+  el.innerHTML = ext.snippets.map((sn,i)=>`
+    <div class="border border-gray-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-medium text-gray-600">Header:</span>
+        <select onchange="updateSnippetHeader(${i},this.value)" class="px-2 py-1 border border-gray-200 rounded text-sm">
+          ${validHeaders.map(h=>`<option value="${h}" ${sn.header===h?'selected':''}>${h}</option>`).join('')}
+        </select>
+        <span class="text-xs text-gray-500 ml-auto">${sn.values.length} values</span>
+        <button class="copy-btn" onclick="copyAllByIndex('snippet-values', ${i}, this)" title="Copy tất cả values">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy values
+        </button>
+        <button onclick="removeSnippet(${i})" class="text-gray-400 hover:text-red-600 text-xs">✕</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        ${sn.values.map((v,vi)=>{
+          const vl = v.length;
+          return `
+            <div class="flex items-center gap-1 border ${vl>25?'border-red-300':'border-gray-200'} rounded p-1.5">
+              <input type="text" value="${escapeAttr(v)}" oninput="updateSnippetValue(${i},${vi},this.value)" maxlength="40" class="flex-1 text-sm min-w-0 outline-none" placeholder="Value (25)">
+              <span class="text-[10px] font-mono ${vl>25?'text-red-600':'text-gray-400'}">${vl}</span>
+              <button onclick="removeSnippetValue(${i},${vi})" class="text-gray-400 hover:text-red-600 text-xs">×</button>
+            </div>
+          `;
+        }).join('')}
+        <button onclick="addSnippetValue(${i})" class="text-xs text-blue-600 border border-dashed border-blue-300 rounded p-1.5 hover:bg-blue-50">+ value</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============ UTM ============
+function rebuildUTM() {
+  const c = activeCampaign();
+  if (!c) {
+    document.getElementById('trackingTemplate').textContent = 'Chưa có campaign';
+    document.getElementById('finalUrlPreview').textContent = '';
+    return;
+  }
+  const u = {
+    source: document.getElementById('utmSource').value.trim() || 'google',
+    medium: document.getElementById('utmMedium').value.trim() || 'cpc',
+    campaign: document.getElementById('utmCampaign').value,
+    campaignCustom: document.getElementById('utmCampaignCustom').value.trim(),
+    content: document.getElementById('utmContent').value,
+    term: document.getElementById('utmTerm').value,
+    extra: document.getElementById('utmExtra').value.trim()
+  };
+  c.utm = u;
+  saveData();
+
+  // Toggle custom inputs
+  document.getElementById('utmCampaignCustom').classList.toggle('hidden', u.campaign !== 'custom');
+
+  // Build tracking template
+  const campVal = u.campaign === 'custom' ? u.campaignCustom : u.campaign;
+  const params = [
+    `utm_source=${encodeValueTrack(u.source)}`,
+    `utm_medium=${encodeValueTrack(u.medium)}`,
+    campVal ? `utm_campaign=${encodeValueTrack(campVal)}` : '',
+    u.content !== 'none' ? `utm_content=${encodeValueTrack(u.content)}` : '',
+    u.term !== 'none' ? `utm_term=${encodeValueTrack(u.term)}` : '',
+    u.extra
+  ].filter(Boolean).join('&');
+
+  const template = `{lpurl}?${params}`;
+  document.getElementById('trackingTemplate').textContent = template;
+
+  // Final URL preview — with sample substitutions
+  const sampleURL = c.url || 'https://example.com/page';
+  const preview = template
+    .replace('{lpurl}', sampleURL)
+    .replace('{campaignname}', encodeURIComponent(c.name))
+    .replace('{adgroupname}', encodeURIComponent(activeAdGroup()?.name || 'Ad Group 1'))
+    .replace('{keyword}', 'your+keyword')
+    .replace('{creative}', '1234567890')
+    .replace('{searchterm}', 'user+search+query')
+    .replace('{gclid}', 'sample_gclid_123')
+    .replace('{device}', 'm');
+  document.getElementById('finalUrlPreview').textContent = preview;
+}
+function encodeValueTrack(v) {
+  // Don't URL-encode ValueTrack params, they need to stay as {...}
+  if (/^\{[a-zA-Z_]+\}$/.test(v)) return v;
+  return encodeURIComponent(v);
+}
+function copyTrackingTemplate() {
+  const t = document.getElementById('trackingTemplate').textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('✓ Copied tracking template'));
+}
+
+// ============ PREVIEW ============
+function setPreviewDevice(d) {
+  STATE.previewDevice = d;
+  document.getElementById('pvDesktop').className = d==='desktop'?'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm':'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  document.getElementById('pvMobile').className = d==='mobile'?'px-3 py-1.5 rounded-md font-medium bg-white shadow-sm':'px-3 py-1.5 rounded-md font-medium text-gray-600';
+  renderPreview();
+}
+function renderPreview() {
+  const ag = activeAdGroup(), c = activeCampaign();
+  const container = document.getElementById('previewContainer');
+  if (!c || !ag) { container.innerHTML = '<div class="card p-8 text-center text-sm text-gray-400">Chọn ad group để xem preview</div>'; return; }
+
+  const vH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
+  const vD = ag.descriptions.filter(d=>d.text.trim() && d.text.length<=90);
+  if (vH.length < 3 || vD.length < 1) {
+    container.innerHTML = '<div class="card p-8 text-center text-sm text-gray-400">Cần tối thiểu 3 headlines + 1 description</div>';
+    return;
+  }
+
+  const shuffled = [...vH].sort(()=>Math.random()-0.5);
+  const h1 = shuffled[0].text, h2 = shuffled[1].text, h3 = shuffled[2]?.text;
+  const d1 = vD[Math.floor(Math.random()*vD.length)].text;
+  const d2 = vD.length > 1 ? vD[Math.floor(Math.random()*vD.length)].text : '';
+  const url = ag.url || c.url || 'https://example.com';
+  const domain = url.replace(/^https?:\/\//,'').split('/')[0];
+  const displayUrl = domain + (ag.path1 ? '/' + ag.path1 : '') + (ag.path2 ? '/' + ag.path2 : '');
+
+  // Get extensions (from campaign or ad group)
+  const ext = (ag.extensions.sitelinks.length + ag.extensions.callouts.length + ag.extensions.snippets.length > 0) ? ag.extensions : c.extensions;
+  const sitelinks = ext.sitelinks.filter(s => s.text.trim() && s.text.length <= 25);
+  const callouts = ext.callouts.filter(co => co.text.trim() && co.text.length <= 25);
+  const snippets = ext.snippets.filter(sn => sn.values.filter(v=>v.trim()).length >= 3);
+
+  const device = STATE.previewDevice;
+  const wrapperWidth = device === 'mobile' ? 'max-w-sm mx-auto' : 'max-w-2xl';
+  const headlineSep = device === 'mobile' ? ' · ' : ' | ';
+
+  container.innerHTML = `
+    <div class="${wrapperWidth} transition-all">
+      <div class="card p-5 bg-white">
+        <div class="mb-1">
+          <span class="serp-ad-tag">Ad</span>
+          <span class="serp-url">${escapeHTML(displayUrl)}</span>
+        </div>
+        <div class="serp-headline hover:underline cursor-pointer mb-1">
+          ${escapeHTML(h1)}${h2 ? headlineSep + escapeHTML(h2) : ''}${h3 && device==='desktop' ? headlineSep + escapeHTML(h3) : ''}
+        </div>
+        <div class="serp-desc mb-2">${escapeHTML(d1)}${d2 && device==='desktop' ? ' ' + escapeHTML(d2) : ''}</div>
+
+        ${callouts.length > 0 ? `
+          <div class="serp-callout mb-2">${callouts.slice(0,4).map(co=>escapeHTML(co.text)).join(' · ')}</div>
+        ` : ''}
+
+        ${snippets.length > 0 ? snippets.slice(0,1).map(sn=>`
+          <div class="serp-callout mb-2"><span class="font-medium">${escapeHTML(sn.header)}:</span> ${sn.values.filter(v=>v.trim()).slice(0,4).map(v=>escapeHTML(v)).join(' · ')}</div>
+        `).join('') : ''}
+
+        ${sitelinks.length > 0 ? `
+          <div class="mt-3 pt-3 border-t border-gray-100 ${device==='mobile' ? 'space-y-2' : 'grid grid-cols-2 gap-2'}">
+            ${sitelinks.slice(0, device==='mobile'?3:4).map(s=>`
+              <div>
+                <a class="serp-sitelink hover:underline">${escapeHTML(s.text)}</a>
+                ${device==='desktop' && (s.desc1 || s.desc2) ? `
+                  <div class="serp-sitelink-desc">${escapeHTML(s.desc1 || '')}</div>
+                  ${s.desc2 ? `<div class="serp-sitelink-desc">${escapeHTML(s.desc2)}</div>` : ''}
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="mt-4 text-xs text-gray-500 text-center">
+        Preview này dùng random combo của headlines/descriptions. Google có thể hiển thị khác tùy traffic.
+      </div>
+    </div>
+  `;
+}
+function rollPreview() { renderPreview(); }
+
+// ============ AI GENERATION ============
+async function generateCreative() {
+  if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (!ag.theme || !ag.usp) { toast('⚠ Điền Theme và USP của ad group trước'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+  try {
+    const prompt = buildCreativePrompt(ag);
+    const resp = await callAI(prompt);
+    const parsed = parseJSONResponse(resp);
+    if (!parsed) throw new Error('Không parse được AI response');
+    ag.headlines = parsed.headlines.slice(0,15).map(t=>({text:t,pinned:null}));
+    ag.descriptions = parsed.descriptions.slice(0,4).map(t=>({text:t,pinned:null}));
+    saveData();
+    renderHeadlines(); renderDescriptions(); renderStrength(); renderAdGroupTabs(); renderSidebar();
+    toast(`✓ ${ag.headlines.length}H + ${ag.descriptions.length}D generated`);
+  } catch(e) {
+    console.error(e); toast('✗ ' + e.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '✨ AI Gen';
+  }
+}
+async function regenerateOne() { generateCreative(); }
+
+async function generateExtensions() {
+  if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
+  const c = activeCampaign(), ag = activeAdGroup();
+  if (!c || !ag) return;
+
+  const btn = document.getElementById('genExtBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+  try {
+    const prompt = buildExtensionsPrompt(c, ag);
+    const resp = await callAI(prompt);
+    const parsed = parseJSONResponse(resp);
+    if (!parsed) throw new Error('Không parse được response');
+
+    const target = currentExtObj();
+    if (Array.isArray(parsed.sitelinks)) {
+      target.sitelinks = parsed.sitelinks.slice(0,8).map(s=>({
+        text: s.text||'',
+        url: s.url||c.url||'',
+        desc1: s.desc1||'',
+        desc2: s.desc2||''
+      }));
+    }
+    if (Array.isArray(parsed.callouts)) target.callouts = parsed.callouts.slice(0,10).map(t=>({text: typeof t === 'string' ? t : t.text||''}));
+    if (Array.isArray(parsed.snippets)) target.snippets = parsed.snippets.slice(0,3).map(sn=>({
+      header: sn.header || 'Services',
+      values: (sn.values || []).slice(0,10)
+    }));
+    saveData();
+    renderExtensions();
+    toast(`✓ Extensions generated`);
+  } catch(e) {
+    console.error(e); toast('✗ ' + e.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '✨ Generate all';
+  }
+}
+
+function buildCreativePrompt(ag) {
+  const langInstruction = ag.lang === 'vietnamese' ? 'Viết bằng tiếng Việt có dấu đầy đủ.' : 'Write in English.';
+  return `You are a Google Ads RSA expert copywriter.
+
+AD GROUP BRIEF:
+- Theme/Focus: ${ag.theme}
+- USP/Value props: ${ag.usp}
+- Target keywords: ${ag.keywords||'none'}
+- Offer/Promo: ${ag.offer||'none'}
+- Tone: ${ag.tone}
+
+LANGUAGE: ${langInstruction}
+
+STRICT RULES:
+1. EXACTLY 15 headlines, each MAX 30 chars (count spaces carefully)
+2. EXACTLY 4 descriptions, each MAX 90 chars
+3. NO duplicates, NO ALL CAPS, max 1 "!" per headline never at end
+4. Each headline serves different angle: brand, benefits, features, social proof, urgency, offer, CTA, location, questions, problem-solution, comparison, quality, guarantee, keyword-rich
+5. Include main keywords naturally in >= 3 headlines
+6. Descriptions: benefit-led, include CTA, expand on headlines
+
+OUTPUT: ONLY valid JSON, no markdown:
+{
+  "headlines": ["...", ... 15 items],
+  "descriptions": ["...", "...", "...", "..."]
+}`;
+}
+
+function buildExtensionsPrompt(c, ag) {
+  const langInstruction = ag.lang === 'vietnamese' ? 'Viết bằng tiếng Việt có dấu.' : 'Write in English.';
+  return `You are a Google Ads extensions expert.
+
+CAMPAIGN: ${c.name}
+AD GROUP: ${ag.name} - ${ag.theme}
+USP: ${ag.usp}
+OFFER: ${ag.offer||'none'}
+URL: ${c.url||'https://example.com'}
+
+LANGUAGE: ${langInstruction}
+
+TASK: Generate 3 types of ad extensions.
+
+RULES:
+- SITELINKS: 6 links. text max 25 chars, desc1 & desc2 each max 35 chars. url should be relative like /contact or /services
+- CALLOUTS: 8 short phrases, max 25 chars each. Highlight benefits/trust signals
+- STRUCTURED SNIPPETS: 2 snippets. Each has a "header" from valid list (Services, Products, Types, Brands, Amenities, Courses, Destinations, Models, Featured hotels) and 4-6 "values" each max 25 chars
+
+OUTPUT: ONLY valid JSON:
+{
+  "sitelinks": [
+    {"text":"About us","url":"/about","desc1":"Learn about our story","desc2":"20+ years experience"},
+    ... 6 items
+  ],
+  "callouts": ["Free quote","24/7 support",...],
+  "snippets": [
+    {"header":"Services","values":["Service A","Service B","Service C","Service D"]},
+    {"header":"Types","values":["Type 1","Type 2","Type 3","Type 4"]}
+  ]
+}`;
+}
+
+async function callAI(prompt) {
+  const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + STATE.settings.apiKey,
+      'HTTP-Referer': window.location.origin || 'https://rsa-builder.local',
+      'X-Title': 'RSA Builder Pro'
+    },
+    body: JSON.stringify({
+      model: STATE.settings.model,
+      messages: [
+        { role:'system', content:'You are a Google Ads copywriting expert. Respond only with valid JSON.' },
+        { role:'user', content: prompt }
+      ],
+      temperature: 0.8,
+      max_tokens: 3000
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`API ${resp.status}: ${err.slice(0,200)}`);
+  }
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+function parseJSONResponse(text) {
+  let cleaned = text.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+  const start = cleaned.indexOf('{'), end = cleaned.lastIndexOf('}');
+  if (start === -1 || end === -1) return null;
+  cleaned = cleaned.slice(start, end+1);
+  try { return JSON.parse(cleaned); } catch(e) { console.error(e); return null; }
+}
+
+// ============ EXPORT ============
+function exportAll() { document.getElementById('exportModal').classList.remove('hidden'); }
+function closeExport() { document.getElementById('exportModal').classList.add('hidden'); }
+
+function exportCampaignCSV() {
+  const c = activeCampaign();
+  if (!c) { toast('Chưa có campaign'); return; }
+
+  const headers = [
+    'Campaign','Ad group','Ad type','Final URL','Path 1','Path 2',
+    ...Array.from({length:15}, (_,i)=>[`Headline ${i+1}`,`Headline ${i+1} position`]).flat(),
+    ...Array.from({length:4}, (_,i)=>[`Description ${i+1}`,`Description ${i+1} position`]).flat()
+  ];
+
+  const rows = [];
+  c.adGroups.forEach(ag => {
+    const row = [c.name, ag.name, 'Responsive search ad', ag.url || c.url, ag.path1, ag.path2];
+    for (let i=0;i<15;i++) {
+      const h = ag.headlines[i];
+      row.push(h?h.text:'', h&&h.pinned?h.pinned:'');
+    }
+    for (let i=0;i<4;i++) {
+      const d = ag.descriptions[i];
+      row.push(d?d.text:'', d&&d.pinned?d.pinned:'');
+    }
+    rows.push(row);
+  });
+
+  const csv = [headers, ...rows].map(r => r.map(csvEscape).join(',')).join('\n');
+  downloadFile(c.name.replace(/[^a-z0-9]+/gi,'_') + '_RSA.csv', '\uFEFF'+csv, 'text/csv');
+  closeExport();
+  toast('✓ CSV exported');
+}
+function exportExtensionsCSV() {
+  const c = activeCampaign();
+  if (!c) return;
+  let csv = 'Type,Campaign,Ad group,Field 1,Field 2,Field 3,URL\n';
+  const exports = [];
+  const collectExt = (scope, ag) => {
+    const ext = scope === 'campaign' ? c.extensions : ag.extensions;
+    const agName = scope === 'campaign' ? '' : ag.name;
+    ext.sitelinks.forEach(s => exports.push(['Sitelink', c.name, agName, s.text, s.desc1, s.desc2, s.url]));
+    ext.callouts.forEach(co => exports.push(['Callout', c.name, agName, co.text, '', '', '']));
+    ext.snippets.forEach(sn => exports.push(['Structured snippet', c.name, agName, sn.header, sn.values.join('|'), '', '']));
+  };
+  collectExt('campaign');
+  c.adGroups.forEach(ag => collectExt('adgroup', ag));
+  csv += exports.map(r => r.map(csvEscape).join(',')).join('\n');
+  downloadFile(c.name.replace(/[^a-z0-9]+/gi,'_') + '_Extensions.csv', '\uFEFF'+csv, 'text/csv');
+  closeExport();
+  toast('✓ Extensions CSV exported');
+}
+function exportJSON() {
+  const blob = JSON.stringify({ campaigns: STATE.campaigns, exported: new Date().toISOString() }, null, 2);
+  downloadFile('rsa_builder_backup_' + Date.now() + '.json', blob, 'application/json');
+  closeExport();
+}
+function importJSON(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data.campaigns)) throw new Error('Invalid backup');
+      if (!confirm(`Import ${data.campaigns.length} campaigns? Sẽ ghi đè data hiện tại.`)) return;
+      STATE.campaigns = data.campaigns;
+      saveData();
+      closeExport();
+      location.reload();
+    } catch(err) { toast('✗ File không hợp lệ'); }
+  };
+  r.readAsText(f);
+}
+function csvEscape(v) { const s = String(v||''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type: type + ';charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function copyAllCreative() {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  let out = `# ${ag.name}\n\n## Headlines (${ag.headlines.length})\n`;
+  ag.headlines.forEach((h,i)=>out += `${i+1}. ${h.text}${h.pinned?' [pin:'+h.pinned+']':''}\n`);
+  out += `\n## Descriptions (${ag.descriptions.length})\n`;
+  ag.descriptions.forEach((d,i)=>out += `${i+1}. ${d.text}${d.pinned?' [pin:'+d.pinned+']':''}\n`);
+  navigator.clipboard.writeText(out).then(()=>toast('✓ Copied'));
+}
+
+// ============ ANALYTICS ============
+
+// Performance data store
+const PERF_DATA = JSON.parse(localStorage.getItem('rsa2_perf') || '{}');
+function savePerfData() { localStorage.setItem('rsa2_perf', JSON.stringify(PERF_DATA)); }
+
+// 14 creative angles to classify headlines
+const ANGLES = [
+  { key:'brand',        label:'Brand/Product',     kw:['brand','company','by'] },
+  { key:'benefit',      label:'Main Benefit',      kw:['save','boost','improve','faster','better','easier','increase','grow','reduce'] },
+  { key:'feature',      label:'Feature',           kw:['includes','with','built-in','powered','advanced','pro','premium'] },
+  { key:'social',       label:'Social Proof',      kw:['rated','review','customer','clients','trusted','years','since','experience','certified','award','million','thousands','families','businesses'] },
+  { key:'urgency',      label:'Urgency/Scarcity',  kw:['today','now','limited','ends','hurry','fast','quickly','same day','2h','24h','instant','immediate'] },
+  { key:'offer',        label:'Offer/Price',       kw:['free','off','save','discount','deal','sale','from','only','$','starting','% off','promo','bonus'] },
+  { key:'cta',          label:'Call to Action',    kw:['get','shop','buy','order','book','call','contact','request','download','start','try','join','sign','apply','claim','learn'] },
+  { key:'location',     label:'Location',          kw:['near','local','nearby','in ','city','area','calgary','vietnam','vn','ca','canada','toronto','hanoi'] },
+  { key:'question',     label:'Question',          kw:['?','need','want','looking','how','why','what','when','which'] },
+  { key:'problem',      label:'Problem-Solution',  kw:['stop','no more','tired of','solve','fix','end','avoid','prevent','eliminate'] },
+  { key:'comparison',   label:'Comparison',        kw:['vs','than','better','best','#1','top','leading','voted','compared','outperform'] },
+  { key:'quality',      label:'Quality/Expertise', kw:['premium','quality','pro','expert','certified','authentic','original','authorized','licensed','professional'] },
+  { key:'guarantee',    label:'Guarantee',         kw:['guarantee','warranty','money back','risk-free','satisfaction','refund','promise','assured'] },
+  { key:'keyword',      label:'Keyword-Rich',      kw:[] }  // filled dynamically from ad group keywords
+];
+
+function classifyHeadline(text, agKeywords = []) {
+  const lower = text.toLowerCase();
+  const matched = [];
+  ANGLES.forEach(a => {
+    if (a.key === 'keyword') {
+      if (agKeywords.some(k => k.length > 2 && lower.includes(k.toLowerCase()))) matched.push(a.key);
+    } else {
+      if (a.kw.some(k => lower.includes(k))) matched.push(a.key);
+    }
+  });
+  return matched.length > 0 ? matched : ['other'];
+}
+
+// ============ HEALTH SCORE (Campaign level) ============
+function calcCampaignHealth(c) {
+  if (!c || c.adGroups.length === 0) return { score: 0, verdict: 'Chưa có ad group nào', metrics: {}, issues: [] };
+
+  const issues = [];
+
+  // 1. Avg Ad Strength across ad groups
+  const asScores = c.adGroups.map(ag => calcAdStrengthFor(ag).score);
+  const avgAS = asScores.reduce((a,b)=>a+b,0) / asScores.length;
+
+  // 2. Extension completeness
+  const campExt = c.extensions;
+  const hasSitelinks = campExt.sitelinks.filter(s=>s.text.trim()).length;
+  const hasCallouts = campExt.callouts.filter(co=>co.text.trim()).length;
+  const hasSnippets = campExt.snippets.filter(sn=>sn.values.filter(v=>v.trim()).length>=3).length;
+  const extScore = (Math.min(hasSitelinks/4,1)*40) + (Math.min(hasCallouts/4,1)*40) + (Math.min(hasSnippets/1,1)*20);
+
+  if (hasSitelinks < 4) issues.push({ severity:'high', text:`Thêm sitelinks (${hasSitelinks}/4 tối thiểu để Google enable)`, action:'extensions' });
+  if (hasCallouts < 4) issues.push({ severity:'med', text:`Thêm callouts (${hasCallouts}/4 tối thiểu)`, action:'extensions' });
+  if (hasSnippets < 1) issues.push({ severity:'low', text:`Chưa có structured snippet nào`, action:'extensions' });
+
+  // 3. Diversity score — avg across ad groups
+  const divScores = c.adGroups.map(ag => calcDiversity(ag).score);
+  const avgDiv = divScores.length > 0 ? divScores.reduce((a,b)=>a+b,0) / divScores.length : 0;
+
+  // 4. Completeness — URL, keywords, paths, briefs
+  let fillCount = 0, fillTotal = 0;
+  fillTotal++; if (c.url) fillCount++;
+  c.adGroups.forEach(ag => {
+    fillTotal += 5;
+    if (ag.theme) fillCount++;
+    if (ag.keywords) fillCount++;
+    if (ag.usp) fillCount++;
+    if (ag.path1 || ag.path2) fillCount++;
+    if (ag.headlines.length >= 8) fillCount++;
+  });
+  const completeness = fillTotal > 0 ? (fillCount / fillTotal) * 100 : 0;
+
+  // 5. Tracking setup
+  const hasTracking = c.utm && c.utm.source && c.utm.medium;
+  if (!hasTracking) issues.push({ severity:'high', text:'Chưa setup UTM tracking', action:'tracking' });
+
+  // 6. Duplicates
+  const dups = findDuplicates(c);
+  if (dups.crossAdGroup.length > 0) issues.push({ severity:'high', text:`${dups.crossAdGroup.length} cặp headlines trùng giữa ad groups`, action:'dup' });
+  if (dups.withinAdGroup.length > 0) issues.push({ severity:'med', text:`${dups.withinAdGroup.length} cặp headlines gần giống trong cùng group`, action:'dup' });
+
+  // 7. URL consistency
+  const hasURL = c.adGroups.filter(ag => ag.url || c.url).length;
+  if (hasURL < c.adGroups.length) issues.push({ severity:'high', text:`${c.adGroups.length - hasURL} ad groups chưa có Final URL`, action:'creative' });
+
+  // 8. Low Ad Strength alert
+  const weakGroups = c.adGroups.filter(ag => calcAdStrengthFor(ag).score < 40);
+  if (weakGroups.length > 0) issues.push({ severity:'high', text:`${weakGroups.length} ad group có Ad Strength thấp (<40): ${weakGroups.slice(0,2).map(g=>g.name).join(', ')}${weakGroups.length>2?'...':''}`, action:'creative' });
+
+  // Combined score
+  const score = Math.round(avgAS * 0.4 + extScore * 0.25 + avgDiv * 0.2 + completeness * 0.15);
+
+  let verdict, color;
+  if (score >= 85) { verdict = 'Excellent — campaign sẵn sàng chạy'; color = '#16a34a'; }
+  else if (score >= 70) { verdict = 'Good — cần refine nhỏ'; color = '#65a30d'; }
+  else if (score >= 50) { verdict = 'Average — cần cải thiện'; color = '#d97706'; }
+  else if (score >= 25) { verdict = 'Poor — nhiều vấn đề cần fix'; color = '#dc2626'; }
+  else { verdict = 'Incomplete — cần setup thêm'; color = '#6b7280'; }
+
+  // Sort issues by severity
+  const sevOrder = { high:0, med:1, low:2 };
+  issues.sort((a,b) => sevOrder[a.severity] - sevOrder[b.severity]);
+
+  return {
+    score, verdict, color,
+    metrics: { avgAS: Math.round(avgAS), extScore: Math.round(extScore), avgDiv: Math.round(avgDiv), completeness: Math.round(completeness) },
+    metricsRaw: { hasSitelinks, hasCallouts, hasSnippets },
+    issues: issues.slice(0, 6)
+  };
+}
+
+// ============ DIVERSITY ============
+function calcDiversity(ag) {
+  if (!ag) return { score:0, coverage:{}, angleCount:{} };
+  const validH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
+  if (validH.length === 0) return { score:0, coverage:{}, angleCount:{} };
+  const kwList = (ag.keywords || '').split('\n').map(k=>k.trim()).filter(Boolean);
+  const coverage = {}, angleCount = {};
+  ANGLES.forEach(a => { coverage[a.key] = 0; angleCount[a.key] = 0; });
+
+  validH.forEach(h => {
+    const angles = classifyHeadline(h.text, kwList);
+    angles.forEach(a => {
+      if (coverage[a] !== undefined) {
+        coverage[a]++;
+        angleCount[a]++;
+      }
+    });
+  });
+
+  // Coverage score — how many angles have >=1 headline
+  const covered = Object.values(coverage).filter(v => v > 0).length;
+  const totalAngles = ANGLES.length;
+  const coverageScore = (covered / totalAngles) * 100;
+
+  // Distribution penalty — if too many headlines in 1 angle (>40%)
+  const maxPct = validH.length > 0 ? Math.max(...Object.values(coverage)) / validH.length : 0;
+  const distribPenalty = maxPct > 0.4 ? (maxPct - 0.4) * 50 : 0;
+
+  const score = Math.max(0, Math.min(100, Math.round(coverageScore - distribPenalty)));
+
+  return { score, coverage, angleCount, covered, maxPct: Math.round(maxPct * 100), validCount: validH.length };
+}
+
+// ============ DUPLICATE DETECTION ============
+function similarity(a, b) {
+  if (!a || !b) return 0;
+  const wA = new Set(a.toLowerCase().split(/\s+/).filter(w=>w.length>2));
+  const wB = new Set(b.toLowerCase().split(/\s+/).filter(w=>w.length>2));
+  if (wA.size === 0 || wB.size === 0) return 0;
+  const intersection = [...wA].filter(x => wB.has(x)).length;
+  const union = new Set([...wA, ...wB]).size;
+  return intersection / union;
+}
+
+function findDuplicates(c) {
+  const withinAdGroup = [];
+  const crossAdGroup = [];
+  const crossCampaign = [];
+  const THRESHOLD = 0.6;
+
+  if (!c) return { withinAdGroup, crossAdGroup, crossCampaign };
+
+  // Within each ad group
+  c.adGroups.forEach(ag => {
+    for (let i = 0; i < ag.headlines.length; i++) {
+      for (let j = i+1; j < ag.headlines.length; j++) {
+        const sim = similarity(ag.headlines[i].text, ag.headlines[j].text);
+        if (sim >= THRESHOLD) {
+          withinAdGroup.push({
+            adGroupId: ag.id, adGroupName: ag.name,
+            type: 'headline', idx1: i, idx2: j,
+            text1: ag.headlines[i].text, text2: ag.headlines[j].text,
+            similarity: Math.round(sim * 100)
+          });
+        }
+      }
+    }
+  });
+
+  // Across ad groups within same campaign
+  for (let x = 0; x < c.adGroups.length; x++) {
+    for (let y = x+1; y < c.adGroups.length; y++) {
+      const ag1 = c.adGroups[x], ag2 = c.adGroups[y];
+      ag1.headlines.forEach((h1, i1) => {
+        ag2.headlines.forEach((h2, i2) => {
+          const sim = similarity(h1.text, h2.text);
+          if (sim >= THRESHOLD) {
+            crossAdGroup.push({
+              ag1: ag1.name, ag2: ag2.name,
+              text1: h1.text, text2: h2.text,
+              similarity: Math.round(sim * 100)
+            });
+          }
+        });
+      });
+    }
+  }
+
+  // Across campaigns
+  STATE.campaigns.forEach(oc => {
+    if (oc.id === c.id) return;
+    oc.adGroups.forEach(oag => {
+      c.adGroups.forEach(cag => {
+        oag.headlines.forEach(h1 => {
+          cag.headlines.forEach(h2 => {
+            const sim = similarity(h1.text, h2.text);
+            if (sim >= 0.75) {
+              crossCampaign.push({
+                camp: oc.name, ag: oag.name,
+                text1: h1.text, text2: h2.text,
+                similarity: Math.round(sim * 100)
+              });
+            }
+          });
+        });
+      });
+    });
+  });
+
+  return { withinAdGroup, crossAdGroup: crossAdGroup.slice(0,20), crossCampaign: crossCampaign.slice(0,10) };
+}
+
+// ============ KEYWORD ALIGNMENT ============
+function calcKeywordAlignment(ag) {
+  if (!ag) return [];
+  const kws = (ag.keywords || '').split('\n').map(k=>k.trim().toLowerCase()).filter(Boolean);
+  const validH = ag.headlines.filter(h=>h.text.trim()).map(h=>h.text.toLowerCase());
+  const validD = ag.descriptions.filter(d=>d.text.trim()).map(d=>d.text.toLowerCase());
+
+  return kws.map(kw => {
+    const hMatches = validH.filter(h => h.includes(kw)).length;
+    const dMatches = validD.filter(d => d.includes(kw)).length;
+    const hPct = validH.length > 0 ? (hMatches/validH.length)*100 : 0;
+    const status = hMatches === 0 ? 'missing' : hMatches >= 2 ? 'good' : 'weak';
+    return { keyword: kw, hMatches, dMatches, hTotal: validH.length, dTotal: validD.length, hPct, status };
+  });
+}
+
+// ============ ANALYTICS RENDER ============
+let _charts = {}; // Store Chart.js instances
+function renderAnalytics() {
+  const c = activeCampaign();
+  if (!c) {
+    document.getElementById('healthScore').textContent = '—';
+    document.getElementById('healthVerdict').textContent = 'Chọn campaign để xem analytics';
+    return;
+  }
+
+  renderHealthDashboard(c);
+  renderLeaderboard(c);
+  renderDuplicates(c);
+  renderDiversityPicker(c);
+  renderDiversity();
+  renderKeywordAlignment(c);
+  renderPerformance(c);
+}
+
+function renderHealthDashboard(c) {
+  const h = calcCampaignHealth(c);
+  const circumference = 352; // 2πr, r=56
+
+  document.getElementById('healthScore').textContent = h.score;
+  document.getElementById('healthVerdict').textContent = h.verdict;
+
+  const ring = document.getElementById('healthRing');
+  ring.style.strokeDashoffset = circumference - (circumference * h.score / 100);
+  ring.style.stroke = h.color;
+
+  // Metrics
+  document.getElementById('metricAS').textContent = h.metrics.avgAS;
+  document.getElementById('metricAS').style.color = h.metrics.avgAS >= 65 ? '#16a34a' : h.metrics.avgAS >= 40 ? '#d97706' : '#dc2626';
+  document.getElementById('metricASBar').innerHTML = `<div class="strength-fill" style="width:${h.metrics.avgAS}%;background:${h.metrics.avgAS >= 65 ? '#16a34a' : h.metrics.avgAS >= 40 ? '#d97706' : '#dc2626'}"></div>`;
+
+  document.getElementById('metricExt').textContent = h.metrics.extScore + '%';
+  document.getElementById('metricExtDesc').textContent = `${h.metricsRaw.hasSitelinks} sitelinks · ${h.metricsRaw.hasCallouts} callouts · ${h.metricsRaw.hasSnippets} snippets`;
+
+  document.getElementById('metricDiv').textContent = h.metrics.avgDiv + '%';
+
+  document.getElementById('metricComp').textContent = h.metrics.completeness + '%';
+
+  // Top issues
+  const issuesEl = document.getElementById('topIssues');
+  if (h.issues.length === 0) {
+    issuesEl.innerHTML = '<div class="text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg">✓ Không có issue nào — campaign sẵn sàng chạy</div>';
+  } else {
+    issuesEl.innerHTML = h.issues.map(iss => {
+      const colors = iss.severity === 'high' ? 'bg-red-50 text-red-800 border-red-200' :
+                     iss.severity === 'med' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                     'bg-blue-50 text-blue-800 border-blue-200';
+      const icon = iss.severity === 'high' ? '🔴' : iss.severity === 'med' ? '🟡' : '🔵';
+      return `
+        <div class="flex items-center justify-between border ${colors} rounded-lg px-3 py-2 text-xs">
+          <span class="flex items-center gap-2"><span>${icon}</span><span>${iss.text}</span></span>
+          <button onclick="switchView('${iss.action === 'dup' ? 'analytics' : iss.action}')" class="text-xs underline opacity-70 hover:opacity-100">Fix →</button>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function renderLeaderboard(c) {
+  const rows = c.adGroups.map(ag => {
+    const as = calcAdStrengthFor(ag);
+    const div = calcDiversity(ag);
+    const perf = PERF_DATA[ag.name];
+    const combinedScore = perf ? Math.round(as.score * 0.5 + div.score * 0.3 + Math.min((perf.ctr || 0) * 10, 100) * 0.2) : Math.round(as.score * 0.7 + div.score * 0.3);
+
+    // Why it's good / weak
+    const pros = [], cons = [];
+    if (as.score >= 70) pros.push('AS cao');
+    if (ag.headlines.length >= 13) pros.push(`${ag.headlines.length}H đầy đủ`);
+    if (div.covered >= 8) pros.push(`${div.covered}/14 angles`);
+    const kwAlign = calcKeywordAlignment(ag);
+    const kwCovered = kwAlign.filter(k => k.status !== 'missing').length;
+    if (kwAlign.length > 0 && kwCovered / kwAlign.length >= 0.7) pros.push('KW coverage tốt');
+    if (perf && perf.ctr > 3) pros.push(`CTR ${perf.ctr}%`);
+
+    if (as.score < 50) cons.push('AS thấp');
+    if (ag.headlines.length < 8) cons.push(`Thiếu H (${ag.headlines.length}/8)`);
+    if (ag.descriptions.length < 3) cons.push(`Thiếu D`);
+    if (div.covered < 5) cons.push(`Chỉ ${div.covered} angles`);
+    if (div.maxPct > 40) cons.push(`${div.maxPct}% lặp 1 angle`);
+    if (kwAlign.length > 0 && kwCovered === 0) cons.push('KW chưa phủ');
+    if (perf && perf.ctr < 1.5) cons.push(`CTR thấp ${perf.ctr}%`);
+
+    return { ag, score: combinedScore, as, div, pros, cons, perf };
+  }).sort((a,b) => b.score - a.score);
+
+  document.getElementById('lbCount').textContent = `${rows.length} groups`;
+
+  // Chart
+  const ctx = document.getElementById('leaderboardChart').getContext('2d');
+  if (_charts.leaderboard) _charts.leaderboard.destroy();
+  _charts.leaderboard = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.ag.name),
+      datasets: [
+        { label:'Ad Strength', data: rows.map(r=>r.as.score), backgroundColor:'#3b82f6', borderRadius:4 },
+        { label:'Diversity', data: rows.map(r=>r.div.score), backgroundColor:'#10b981', borderRadius:4 },
+        { label:'Overall', data: rows.map(r=>r.score), backgroundColor:'#8b5cf6', borderRadius:4 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position:'top', labels:{ font:{size:11}, boxWidth:12 } } },
+      scales: { y: { beginAtZero:true, max:100, ticks:{font:{size:10}} }, x: { ticks:{font:{size:10}} } }
+    }
+  });
+
+  // Table
+  const tbody = document.getElementById('leaderboardBody');
+  tbody.innerHTML = rows.map((r, rank) => {
+    const rankBadge = rank === 0 ? '<span class="text-amber-500">🏆</span>' : `<span class="text-gray-400">${rank+1}</span>`;
+    const scoreColor = r.score >= 70 ? 'text-green-600' : r.score >= 40 ? 'text-amber-600' : 'text-red-600';
+    const flag = r.score < 40 ? '<span class="chip chip-err ml-1">Weak</span>' : r.score >= 80 ? '<span class="chip chip-ok ml-1">Top</span>' : '';
+    return `
+      <tr class="border-b border-gray-100 hover:bg-gray-50">
+        <td class="py-2.5 pr-2 font-mono text-xs">${rankBadge}</td>
+        <td class="py-2.5 pr-2 font-medium">${escapeHTML(r.ag.name)}${flag}</td>
+        <td class="py-2.5 pr-2"><span class="font-bold ${scoreColor}">${r.score}</span></td>
+        <td class="py-2.5 pr-2 text-xs text-gray-500">${r.ag.headlines.length}/${r.ag.descriptions.length}</td>
+        <td class="py-2.5 pr-2 text-xs">${r.pros.length ? r.pros.slice(0,3).map(p=>`<span class="chip chip-ok mr-1">${p}</span>`).join('') : '<span class="text-gray-400">—</span>'}</td>
+        <td class="py-2.5 pr-2 text-xs">${r.cons.length ? r.cons.slice(0,3).map(p=>`<span class="chip chip-warn mr-1">${p}</span>`).join('') : '<span class="text-gray-400">—</span>'}</td>
+        <td class="py-2.5 text-right"><button onclick="loadAdGroup('${r.ag.id}'); switchView('creative')" class="text-xs text-blue-600 hover:underline">Open →</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderDuplicates(c) {
+  const dups = findDuplicates(c);
+  const total = dups.withinAdGroup.length + dups.crossAdGroup.length + dups.crossCampaign.length;
+  document.getElementById('dupCount').textContent = total === 0 ? '✓ No duplicates' : `${total} issues found`;
+
+  const el = document.getElementById('dupResults');
+  if (total === 0) {
+    el.innerHTML = '<div class="text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg">✓ Không phát hiện trùng lặp đáng kể</div>';
+    return;
+  }
+
+  let html = '';
+  if (dups.withinAdGroup.length > 0) {
+    html += `<div class="mb-3">
+      <div class="text-xs font-semibold text-gray-700 mb-1.5">🔸 Trong cùng ad group (${dups.withinAdGroup.length})</div>
+      ${dups.withinAdGroup.slice(0,6).map(d=>`
+        <div class="border border-amber-200 bg-amber-50 rounded-lg p-2 mb-1.5">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-medium text-amber-900">${escapeHTML(d.adGroupName)}</span>
+            <span class="chip chip-warn">${d.similarity}% similar</span>
+          </div>
+          <div class="text-xs text-gray-700 space-y-0.5">
+            <div>• ${escapeHTML(d.text1)}</div>
+            <div>• ${escapeHTML(d.text2)}</div>
+          </div>
+          <button onclick="loadAdGroup('${d.adGroupId}'); switchView('creative')" class="text-[10px] text-blue-600 hover:underline mt-1">Open ad group →</button>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+  if (dups.crossAdGroup.length > 0) {
+    html += `<div class="mb-3">
+      <div class="text-xs font-semibold text-gray-700 mb-1.5">🔸 Giữa các ad groups (${dups.crossAdGroup.length})</div>
+      <div class="text-xs text-gray-500 mb-1.5">Google cần variation giữa các ad groups để test, trùng sẽ giảm tín hiệu learning</div>
+      ${dups.crossAdGroup.slice(0,5).map(d=>`
+        <div class="border border-red-200 bg-red-50 rounded-lg p-2 mb-1.5">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs"><strong>${escapeHTML(d.ag1)}</strong> ↔ <strong>${escapeHTML(d.ag2)}</strong></span>
+            <span class="chip chip-err">${d.similarity}%</span>
+          </div>
+          <div class="text-xs text-gray-700 space-y-0.5">
+            <div>• ${escapeHTML(d.text1)}</div>
+            <div>• ${escapeHTML(d.text2)}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+  if (dups.crossCampaign.length > 0) {
+    html += `<div>
+      <div class="text-xs font-semibold text-gray-700 mb-1.5">🔴 Trùng giữa các campaigns (${dups.crossCampaign.length}) — có thể cannibalize</div>
+      ${dups.crossCampaign.slice(0,5).map(d=>`
+        <div class="border border-red-300 bg-red-50 rounded-lg p-2 mb-1.5">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs">Campaign: <strong>${escapeHTML(d.camp)}</strong> / ${escapeHTML(d.ag)}</span>
+            <span class="chip chip-err">${d.similarity}%</span>
+          </div>
+          <div class="text-xs text-gray-700 space-y-0.5">
+            <div>• ${escapeHTML(d.text1)}</div>
+            <div>• ${escapeHTML(d.text2)}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderDiversityPicker(c) {
+  const sel = document.getElementById('divAgSelect');
+  sel.innerHTML = c.adGroups.map(ag => `<option value="${ag.id}" ${ag.id === STATE.activeAdGroupId ? 'selected':''}>${escapeHTML(ag.name)}</option>`).join('');
+}
+
+function renderDiversity() {
+  const c = activeCampaign();
+  if (!c) return;
+  const agId = document.getElementById('divAgSelect').value || STATE.activeAdGroupId;
+  const ag = c.adGroups.find(x=>x.id === agId) || c.adGroups[0];
+  if (!ag) return;
+
+  const div = calcDiversity(ag);
+  const kwList = (ag.keywords||'').split('\n').map(k=>k.trim()).filter(Boolean);
+
+  // Radar chart
+  const ctx = document.getElementById('diversityRadar').getContext('2d');
+  if (_charts.radar) _charts.radar.destroy();
+  _charts.radar = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ANGLES.map(a => a.label.length > 14 ? a.label.slice(0,12)+'…' : a.label),
+      datasets: [{
+        label: 'Coverage',
+        data: ANGLES.map(a => div.coverage[a.key] || 0),
+        backgroundColor: 'rgba(59,130,246,0.2)',
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        pointBackgroundColor: '#3b82f6',
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ bodyFont:{size:11} } },
+      scales: { r: { beginAtZero:true, ticks:{ stepSize:1, font:{size:9} }, pointLabels:{ font:{size:10} } } }
+    }
+  });
+
+  // Headline classification
+  const validH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
+  const cel = document.getElementById('headlineClassification');
+  if (validH.length === 0) {
+    cel.innerHTML = '<div class="text-xs text-gray-400 italic">Chưa có headlines hợp lệ</div>';
+  } else {
+    cel.innerHTML = validH.map((h,i)=>{
+      const angles = classifyHeadline(h.text, kwList);
+      return `
+        <div class="border border-gray-100 rounded-md p-1.5 text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="text-gray-400 font-mono text-[10px] w-4">${i+1}</span>
+            <span class="flex-1 min-w-0 truncate">${escapeHTML(h.text)}</span>
+          </div>
+          <div class="flex flex-wrap gap-0.5 mt-0.5 pl-5">
+            ${angles.map(a => {
+              if (a === 'other') return '<span class="chip chip-warn">Other</span>';
+              const ang = ANGLES.find(x=>x.key===a);
+              return `<span class="chip chip-info">${ang.label}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Suggestions
+  const suggs = [];
+  const missing = ANGLES.filter(a => !div.coverage[a.key] || div.coverage[a.key] === 0).slice(0,4);
+  if (missing.length > 0) {
+    suggs.push({ type:'warn', text:`Thiếu: ${missing.map(m=>m.label).join(', ')}` });
+  }
+  if (div.maxPct > 40) {
+    const dominantAngle = Object.entries(div.coverage).sort((a,b)=>b[1]-a[1])[0];
+    if (dominantAngle) {
+      const angLabel = ANGLES.find(a=>a.key===dominantAngle[0])?.label || dominantAngle[0];
+      suggs.push({ type:'warn', text:`${div.maxPct}% headlines dồn vào "${angLabel}" — đa dạng hơn` });
+    }
+  }
+  if (div.covered >= 10) suggs.push({ type:'ok', text:`Cover ${div.covered}/14 angles — xuất sắc` });
+  if (suggs.length === 0) suggs.push({ type:'ok', text:'Diversity tốt — không có vấn đề nổi bật' });
+  document.getElementById('divSuggestions').innerHTML = suggs.map(s=>{
+    const cls = s.type==='warn'?'text-amber-700 bg-amber-50':'text-green-700 bg-green-50';
+    return `<div class="${cls} px-2 py-1 rounded text-xs">${s.text}</div>`;
+  }).join('');
+}
+
+function renderKeywordAlignment(c) {
+  const el = document.getElementById('kwAlignment');
+  const results = c.adGroups.map(ag => ({ ag, kws: calcKeywordAlignment(ag) }));
+
+  if (results.every(r => r.kws.length === 0)) {
+    el.innerHTML = '<div class="text-xs text-gray-400 italic bg-gray-50 rounded-lg p-3">Chưa có keyword nào được điền trong các ad groups</div>';
+    return;
+  }
+
+  el.innerHTML = results.filter(r => r.kws.length > 0).map(r=>`
+    <div class="border border-gray-200 rounded-lg p-3">
+      <div class="flex items-center justify-between mb-2">
+        <div class="font-medium text-sm">${escapeHTML(r.ag.name)}</div>
+        <div class="text-xs text-gray-500">${r.kws.filter(k=>k.status==='good').length}/${r.kws.length} KW được cover tốt</div>
+      </div>
+      <div class="space-y-1">
+        ${r.kws.map(k => {
+          const barColor = k.status === 'good' ? '#16a34a' : k.status === 'weak' ? '#d97706' : '#dc2626';
+          const icon = k.status === 'good' ? '✓' : k.status === 'weak' ? '!' : '✗';
+          const iconColor = k.status === 'good' ? 'text-green-600' : k.status === 'weak' ? 'text-amber-600' : 'text-red-600';
+          return `
+            <div class="grid grid-cols-12 gap-2 items-center text-xs">
+              <div class="col-span-4 font-mono truncate">${escapeHTML(k.keyword)}</div>
+              <div class="col-span-6">
+                <div class="bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="h-full rounded-full" style="width:${Math.min(k.hPct,100)}%;background:${barColor}"></div>
+                </div>
+              </div>
+              <div class="col-span-2 flex items-center gap-1">
+                <span class="${iconColor} font-bold">${icon}</span>
+                <span class="text-gray-500">${k.hMatches}/${k.hTotal}H</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============ PERFORMANCE IMPORT ============
+function openPerfImport() { document.getElementById('perfImportModal').classList.remove('hidden'); }
+function closePerfImport() { document.getElementById('perfImportModal').classList.add('hidden'); }
+
+function parsePerfPaste() {
+  const text = document.getElementById('perfPasteArea').value.trim();
+  if (!text) { toast('Chưa có data'); return; }
+  processPerfText(text);
+}
+
+function parsePerfCSV(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => processPerfText(e.target.result);
+  r.readAsText(f);
+}
+
+function processPerfText(text) {
+  // Detect delimiter (comma or tab)
+  const delim = text.indexOf('\t') !== -1 ? '\t' : ',';
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { toast('File không hợp lệ'); return; }
+
+  // Parse header
+  const headers = lines[0].split(delim).map(h => h.trim().toLowerCase().replace(/"/g,''));
+  const agIdx = headers.findIndex(h => h.includes('ad group') || h.includes('adgroup'));
+  const impIdx = headers.findIndex(h => h.includes('impress'));
+  const clkIdx = headers.findIndex(h => h.includes('click'));
+  const ctrIdx = headers.findIndex(h => h === 'ctr' || h.includes('ctr'));
+  const convIdx = headers.findIndex(h => h.includes('conversion') && !h.includes('rate') && !h.includes('value'));
+  const costIdx = headers.findIndex(h => h.includes('cost') || h.includes('spend'));
+  const cvrIdx = headers.findIndex(h => h.includes('conv') && h.includes('rate'));
+
+  if (agIdx === -1) { toast('Không tìm thấy cột "Ad group"'); return; }
+
+  let imported = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g,''));
+    const agName = cols[agIdx];
+    if (!agName) continue;
+
+    const imp = parseNum(cols[impIdx]);
+    const clk = parseNum(cols[clkIdx]);
+    const conv = parseNum(cols[convIdx]);
+    const cost = parseNum(cols[costIdx]);
+    let ctr = parseNum(cols[ctrIdx]);
+    if (!ctr && imp) ctr = parseFloat(((clk/imp)*100).toFixed(2));
+    let cvr = parseNum(cols[cvrIdx]);
+    if (!cvr && clk) cvr = parseFloat(((conv/clk)*100).toFixed(2));
+    const cpa = conv > 0 ? parseFloat((cost/conv).toFixed(2)) : null;
+
+    PERF_DATA[agName] = { impressions: imp, clicks: clk, ctr, conversions: conv, cost, cvr, cpa };
+    imported++;
+  }
+
+  savePerfData();
+  closePerfImport();
+  toast(`✓ Imported data cho ${imported} ad groups`);
+  renderAnalytics();
+}
+
+function parseNum(s) {
+  if (!s) return 0;
+  const cleaned = String(s).replace(/[$,%]/g, '').trim();
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+}
+
+function clearPerfData() {
+  if (!confirm('Xóa tất cả performance data đã import?')) return;
+  Object.keys(PERF_DATA).forEach(k => delete PERF_DATA[k]);
+  savePerfData();
+  renderAnalytics();
+  toast('Đã clear performance data');
+}
+
+function renderPerformance(c) {
+  const sect = document.getElementById('perfSection');
+  const hasAny = c.adGroups.some(ag => PERF_DATA[ag.name]);
+  if (!hasAny) { sect.classList.add('hidden'); return; }
+  sect.classList.remove('hidden');
+
+  const rows = c.adGroups.filter(ag => PERF_DATA[ag.name]).map(ag => {
+    const p = PERF_DATA[ag.name];
+    const as = calcAdStrengthFor(ag).score;
+    return { ag, p, as };
+  });
+
+  const avgCTR = rows.reduce((s,r)=>s+(r.p.ctr||0),0) / rows.length;
+  const avgCVR = rows.reduce((s,r)=>s+(r.p.cvr||0),0) / rows.length;
+
+  document.getElementById('perfContent').innerHTML = `
+    <div class="grid grid-cols-4 gap-3 mb-4">
+      <div class="bg-gray-50 rounded-lg p-3">
+        <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Avg CTR</div>
+        <div class="text-xl font-bold">${avgCTR.toFixed(2)}%</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3">
+        <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Avg CVR</div>
+        <div class="text-xl font-bold">${avgCVR.toFixed(2)}%</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3">
+        <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Total Clicks</div>
+        <div class="text-xl font-bold">${rows.reduce((s,r)=>s+(r.p.clicks||0),0).toLocaleString()}</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3">
+        <div class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Total Conversions</div>
+        <div class="text-xl font-bold">${rows.reduce((s,r)=>s+(r.p.conversions||0),0)}</div>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead>
+          <tr class="text-left border-b border-gray-200 text-[10px] uppercase tracking-wider text-gray-500">
+            <th class="pb-2 pr-2">Ad Group</th>
+            <th class="pb-2 pr-2 text-right">Impr.</th>
+            <th class="pb-2 pr-2 text-right">Clicks</th>
+            <th class="pb-2 pr-2 text-right">CTR</th>
+            <th class="pb-2 pr-2 text-right">Conv.</th>
+            <th class="pb-2 pr-2 text-right">CVR</th>
+            <th class="pb-2 pr-2 text-right">Cost</th>
+            <th class="pb-2 pr-2 text-right">CPA</th>
+            <th class="pb-2 pr-2 text-right">AS</th>
+            <th class="pb-2 text-right">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.sort((a,b)=>(b.p.conversions||0)-(a.p.conversions||0)).map(r=>{
+            const ctrColor = r.p.ctr >= avgCTR * 1.2 ? 'text-green-600 font-bold' : r.p.ctr < avgCTR * 0.7 ? 'text-red-600' : '';
+            const cvrColor = r.p.cvr >= avgCVR * 1.2 ? 'text-green-600 font-bold' : r.p.cvr < avgCVR * 0.7 ? 'text-red-600' : '';
+            // Verdict logic
+            let verdict = '—', vCls = 'text-gray-500';
+            if (r.as >= 70 && r.p.ctr >= avgCTR) { verdict = '🏆 Winner'; vCls = 'text-green-600'; }
+            else if (r.as >= 70 && r.p.ctr < avgCTR) { verdict = '🤔 Good creative, weak CTR → LP?'; vCls = 'text-amber-600'; }
+            else if (r.as < 50 && r.p.ctr >= avgCTR) { verdict = '🎲 Lucky — fix creative'; vCls = 'text-blue-600'; }
+            else if (r.as < 50 && r.p.ctr < avgCTR) { verdict = '💀 Rewrite toàn bộ'; vCls = 'text-red-600'; }
+            return `
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 pr-2 font-medium">${escapeHTML(r.ag.name)}</td>
+                <td class="py-2 pr-2 text-right font-mono">${(r.p.impressions||0).toLocaleString()}</td>
+                <td class="py-2 pr-2 text-right font-mono">${(r.p.clicks||0).toLocaleString()}</td>
+                <td class="py-2 pr-2 text-right font-mono ${ctrColor}">${(r.p.ctr||0).toFixed(2)}%</td>
+                <td class="py-2 pr-2 text-right font-mono">${r.p.conversions||0}</td>
+                <td class="py-2 pr-2 text-right font-mono ${cvrColor}">${(r.p.cvr||0).toFixed(2)}%</td>
+                <td class="py-2 pr-2 text-right font-mono">$${(r.p.cost||0).toFixed(0)}</td>
+                <td class="py-2 pr-2 text-right font-mono">${r.p.cpa ? '$'+r.p.cpa : '—'}</td>
+                <td class="py-2 pr-2 text-right font-mono">${r.as}</td>
+                <td class="py-2 text-right text-[10px] ${vCls}">${verdict}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ============ AI VERDICT ============
+async function runAIVerdict() {
+  if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
+  const c = activeCampaign();
+  if (!c) return;
+
+  const btn = document.getElementById('aiVerdictBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> Analyzing...';
+
+  try {
+    const h = calcCampaignHealth(c);
+    const summary = {
+      campaignName: c.name,
+      healthScore: h.score,
+      verdict: h.verdict,
+      topIssues: h.issues.map(i => i.text),
+      adGroups: c.adGroups.map(ag => {
+        const as = calcAdStrengthFor(ag);
+        const div = calcDiversity(ag);
+        const perf = PERF_DATA[ag.name];
+        return {
+          name: ag.name,
+          theme: ag.theme,
+          headlineCount: ag.headlines.length,
+          descriptionCount: ag.descriptions.length,
+          adStrength: as.score,
+          diversityScore: div.score,
+          anglesCovered: div.covered,
+          sampleHeadlines: ag.headlines.slice(0,3).map(h=>h.text),
+          performance: perf ? { ctr: perf.ctr, cvr: perf.cvr, conversions: perf.conversions, cpa: perf.cpa } : null
+        };
+      }),
+      duplicates: findDuplicates(c)
+    };
+
+    const prompt = `Bạn là Google Ads specialist. Phân tích campaign sau và đưa ra audit report bằng tiếng Việt, ngắn gọn và actionable.
+
+DATA:
+${JSON.stringify(summary, null, 2)}
+
+CẤU TRÚC REPORT (dùng markdown):
+
+## 📊 Executive Summary
+[2-3 câu: Overall rating A/B/C/D, điểm mạnh chính, vấn đề lớn nhất]
+
+## 🏆 Winner Ad Group
+[Tên ad group tốt nhất + 2-3 lý do cụ thể tại sao]
+
+## ⚠️ Ad Groups cần chú ý
+[Liệt kê 1-3 ad groups yếu, mỗi cái có lý do + action cụ thể]
+
+## 🎯 Top 5 Actions ngay lập tức
+1. [Action cụ thể, có thể làm được trong 10 phút]
+2. ...
+
+## 💡 Chiến lược tối ưu tiếp theo
+[2-3 gợi ý chiến lược dài hạn]
+
+Giữ tổng độ dài dưới 500 từ. Dùng emoji hợp lý. Concrete và specific, không nói chung chung.`;
+
+    const resp = await callAI(prompt);
+    document.getElementById('aiVerdictSection').classList.remove('hidden');
+    document.getElementById('aiVerdictContent').textContent = resp;
+    // Scroll to result
+    document.getElementById('aiVerdictSection').scrollIntoView({ behavior:'smooth', block:'start' });
+    toast('✓ AI audit completed');
+  } catch (e) {
+    console.error(e);
+    toast('✗ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🤖 AI Audit Report';
+  }
+}
+
+// ============ UTILS ============
+function escapeHTML(s) { return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+function escapeAttr(s) { return escapeHTML(s); }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.add('hidden'), 2800);
+}
+
+// Close modals on outside click
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'settingsModal') closeSettings();
+  if (e.target.id === 'exportModal') closeExport();
+  if (e.target.id === 'perfImportModal') closePerfImport();
+  if (e.target.id === 'quickPasteModal') closeQuickPasteModal();
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

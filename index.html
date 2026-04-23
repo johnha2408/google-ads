@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSA Builder Pro v5 — Robust AI gen + error-safe analytics</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232563eb'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='56' font-weight='700' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+<title>RSA Builder Pro v6 — Fixed validation + inline Chart.js</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -20,7 +21,37 @@ tailwind.config = {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';"></script>
+<!-- Chart.js with multi-CDN fallback -->
+<script>
+  (function loadChartJS() {
+    const cdns = [
+      'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js',
+      'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
+    ];
+    let idx = 0;
+    function tryNext() {
+      if (idx >= cdns.length) {
+        console.error('All Chart.js CDNs failed');
+        window.__chartjsFailed = true;
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = cdns[idx];
+      script.onload = () => { console.log('Chart.js loaded from', cdns[idx]); window.__chartjsReady = true; };
+      script.onerror = () => { idx++; tryNext(); };
+      document.head.appendChild(script);
+    }
+    tryNext();
+    // Mark failed after 5s if still not loaded
+    setTimeout(() => {
+      if (typeof Chart === 'undefined' && !window.__chartjsReady) {
+        console.warn('Chart.js timeout — marking as failed');
+        window.__chartjsFailed = true;
+      }
+    }, 5000);
+  })();
+</script>
 <style>
   * { -webkit-font-smoothing: antialiased; }
   body { font-family: 'Inter', sans-serif; }
@@ -387,6 +418,7 @@ tailwind.config = {
                     </button>
                   </div>
                   <div class="border-t border-gray-100 mt-3 pt-3 space-y-1">
+                    <button onclick="autoFixOverLimit()" id="autoFixBtn" class="w-full px-3 py-1.5 bg-amber-100 text-amber-900 rounded-lg hover:bg-amber-200 text-[11px] font-medium">✂️ Auto-fix items quá ký tự</button>
                     <button onclick="duplicateAdGroup()" class="w-full px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-[11px] font-medium">⎘ Duplicate ad group</button>
                     <button onclick="regenerateOne()" class="w-full px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-[11px] font-medium">🔄 Regenerate AI</button>
                   </div>
@@ -1760,6 +1792,12 @@ function calcAdStrengthFor(ag) {
   const vH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
   const vD = ag.descriptions.filter(d=>d.text.trim() && d.text.length<=90);
   const hCount = vH.length, dCount = vD.length;
+  // Count items that exist but exceed limits
+  const totalH = ag.headlines.filter(h=>h.text.trim()).length;
+  const totalD = ag.descriptions.filter(d=>d.text.trim()).length;
+  const overH = totalH - hCount;
+  const overD = totalD - dCount;
+
   let score = 0;
   const tips = [];
 
@@ -1768,12 +1806,20 @@ function calcAdStrengthFor(ag) {
   else if (hCount >= 8) score += 15;
   else if (hCount >= 5) score += 8;
   else if (hCount >= 3) score += 3;
+
+  if (overH > 0) {
+    tips.push({type:'err',text:`${overH} headline vượt 30 ký tự — cắt ngắn lại`});
+  }
   if (hCount < 8) tips.push({type:'warn',text:`Thêm headlines (${hCount}/8 tối thiểu)`});
   else if (hCount < 15) tips.push({type:'tip',text:`+${15-hCount} headlines nữa để Excellent`});
 
   if (dCount >= 4) score += 15;
   else if (dCount >= 3) score += 10;
   else if (dCount >= 2) score += 5;
+
+  if (overD > 0) {
+    tips.push({type:'err',text:`${overD} description vượt 90 ký tự — cắt ngắn lại`});
+  }
   if (dCount < 4) tips.push({type:'warn',text:`Thêm descriptions (${dCount}/4)`});
 
   const uniqueH = new Set(vH.map(h=>h.text.trim().toLowerCase())).size;
@@ -2168,13 +2214,30 @@ function renderPreview() {
 
   if (vH.length < 3 || vD.length < 1) {
     const missing = [];
-    if (vH.length < 3) missing.push(`<strong>${3 - vH.length}</strong> headlines nữa (hiện có ${vH.length})`);
-    if (vD.length < 1) missing.push(`<strong>${1 - vD.length}</strong> description`);
+    const totalH = ag.headlines.filter(h=>h.text.trim()).length;
+    const totalD = ag.descriptions.filter(d=>d.text.trim()).length;
+    const overH = totalH - vH.length;
+    const overD = totalD - vD.length;
+
+    if (vH.length < 3) {
+      if (overH > 0) {
+        missing.push(`${overH} headline quá 30 ký tự (cần sửa)`);
+      } else {
+        missing.push(`<strong>${3 - vH.length}</strong> headlines nữa (hiện có ${vH.length})`);
+      }
+    }
+    if (vD.length < 1) {
+      if (overD > 0) {
+        missing.push(`${overD} description quá 90 ký tự (cần sửa)`);
+      } else {
+        missing.push(`<strong>${1 - vD.length}</strong> description`);
+      }
+    }
     container.innerHTML = `
       <div class="card p-12 text-center">
         <div class="text-4xl mb-3">👁‍🗨</div>
-        <div class="text-sm font-medium text-gray-900 mb-2">Cần thêm dữ liệu để preview</div>
-        <div class="text-xs text-gray-600 mb-4">Thiếu: ${missing.join(', ')}</div>
+        <div class="text-sm font-medium text-gray-900 mb-2">Cần sửa dữ liệu để preview</div>
+        <div class="text-xs text-gray-600 mb-4">${missing.join(' · ')}</div>
         <button onclick="switchView('creative')" class="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Quay về Creative tab →</button>
       </div>
     `;
@@ -2362,6 +2425,99 @@ OUTPUT: Only JSON array, no other text:
 
 async function regenerateOne() { generateCreative(); }
 
+async function autoFixOverLimit() {
+  const ag = activeAdGroup();
+  if (!ag) return;
+  if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
+
+  // Find over-limit items
+  const overH = ag.headlines.map((h, i) => ({ i, text: h.text, type: 'h' })).filter(x => x.text.trim() && x.text.length > 30);
+  const overD = ag.descriptions.map((d, i) => ({ i, text: d.text, type: 'd' })).filter(x => x.text.trim() && x.text.length > 90);
+
+  if (overH.length === 0 && overD.length === 0) {
+    toast('✓ Không có item nào quá ký tự');
+    return;
+  }
+
+  const btn = document.getElementById('autoFixBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> Auto-fix...';
+
+  try {
+    const langInstruction = ag.lang === 'vietnamese' ? 'Giữ tiếng Việt có dấu.' : 'Keep in English.';
+
+    // Fix headlines
+    if (overH.length > 0) {
+      const prompt = `Rewrite these Google Ads headlines to fit 30 character limit. ${langInstruction}
+Keep the same meaning and intent. Be concise. Count every character including spaces.
+
+Headlines over limit:
+${overH.map((x, idx) => `${idx+1}. "${x.text}" (${x.text.length} chars)`).join('\n')}
+
+OUTPUT: JSON array with rewritten versions in same order, each UNDER 30 chars:
+["rewritten 1", "rewritten 2", ...]`;
+
+      const resp = await callAI(prompt);
+      const arr = extractArray(resp);
+      if (arr && arr.length > 0) {
+        overH.forEach((item, idx) => {
+          if (arr[idx] && arr[idx].length <= 30) {
+            ag.headlines[item.i].text = arr[idx];
+          }
+        });
+      }
+    }
+
+    // Fix descriptions
+    if (overD.length > 0) {
+      await sleep(300);
+      const prompt = `Rewrite these Google Ads descriptions to fit 90 character limit. ${langInstruction}
+Keep the same meaning and CTA. Count every character including spaces.
+
+Descriptions over limit:
+${overD.map((x, idx) => `${idx+1}. "${x.text}" (${x.text.length} chars)`).join('\n')}
+
+OUTPUT: JSON array with rewritten versions in same order, each UNDER 90 chars:
+["rewritten 1", "rewritten 2", ...]`;
+
+      const resp = await callAI(prompt);
+      const arr = extractArray(resp);
+      if (arr && arr.length > 0) {
+        overD.forEach((item, idx) => {
+          if (arr[idx] && arr[idx].length <= 90) {
+            ag.descriptions[item.i].text = arr[idx];
+          }
+        });
+      }
+    }
+
+    saveData();
+    renderHeadlines(); renderDescriptions(); renderStrength();
+    const stillOverH = ag.headlines.filter(h => h.text.trim() && h.text.length > 30).length;
+    const stillOverD = ag.descriptions.filter(d => d.text.trim() && d.text.length > 90).length;
+    const fixedH = overH.length - stillOverH;
+    const fixedD = overD.length - stillOverD;
+    toast(`✓ Fixed ${fixedH}/${overH.length}H + ${fixedD}/${overD.length}D`);
+  } catch (e) {
+    console.error(e); toast('✗ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✂️ Auto-fix items quá ký tự';
+  }
+}
+
+function extractArray(text) {
+  let cleaned = text.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+  const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+  if (!arrMatch) return null;
+  try {
+    const arr = JSON.parse(arrMatch[0]);
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
 async function generateExtensions() {
   if (!STATE.settings.apiKey) { toast('⚠ Chưa có API key'); openSettings(); return; }
   const c = activeCampaign(), ag = activeAdGroup();
@@ -2401,7 +2557,7 @@ async function generateExtensions() {
 }
 
 function buildCreativePrompt(ag) {
-  const langInstruction = ag.lang === 'vietnamese' ? 'Viết bằng tiếng Việt có dấu đầy đủ.' : 'Write in English.';
+  const langInstruction = ag.lang === 'vietnamese' ? 'Viết bằng tiếng Việt có dấu đầy đủ. CẨN THẬN: chữ tiếng Việt có dấu tính bằng ký tự Unicode — 1 dấu = 1 ký tự. Đếm CHÍNH XÁC.' : 'Write in English.';
   return `You are a Google Ads RSA expert copywriter.
 
 AD GROUP BRIEF:
@@ -2413,18 +2569,21 @@ AD GROUP BRIEF:
 
 LANGUAGE: ${langInstruction}
 
-STRICT RULES:
-1. EXACTLY 15 headlines, each MAX 30 chars (count spaces carefully)
-2. EXACTLY 4 descriptions, each MAX 90 chars
-3. NO duplicates, NO ALL CAPS, max 1 "!" per headline never at end
-4. Each headline serves different angle: brand, benefits, features, social proof, urgency, offer, CTA, location, questions, problem-solution, comparison, quality, guarantee, keyword-rich
-5. Include main keywords naturally in >= 3 headlines
-6. Descriptions: benefit-led, include CTA, expand on headlines
+CRITICAL CHARACTER LIMITS (count every character including spaces and punctuation):
+1. EXACTLY 15 headlines — each HARD MAX 30 characters. Aim for 22-28 chars to be safe.
+2. EXACTLY 4 descriptions — each HARD MAX 90 characters. Aim for 75-88 chars to be safe.
+3. BEFORE outputting each line, MENTALLY COUNT the characters. If over the limit, SHORTEN immediately.
 
-OUTPUT: ONLY valid JSON, no markdown:
+OTHER STRICT RULES:
+- NO duplicates, NO ALL CAPS, max 1 "!" per headline never at end
+- Each headline serves different angle: brand, benefits, features, social proof, urgency, offer, CTA, location, questions, problem-solution, comparison, quality, guarantee, keyword-rich
+- Include main keywords naturally in >= 3 headlines
+- Descriptions: benefit-led, include CTA, expand on headlines
+
+OUTPUT: ONLY valid JSON, no markdown, no explanations:
 {
-  "headlines": ["...", ... 15 items],
-  "descriptions": ["...", "...", "...", "..."]
+  "headlines": ["item1", "item2", ... 15 items total],
+  "descriptions": ["desc1", "desc2", "desc3", "desc4"]
 }`;
 }
 
@@ -2866,8 +3025,14 @@ function renderAnalytics() {
 
   // Check Chart.js loaded
   if (typeof Chart === 'undefined') {
-    console.warn('Chart.js not loaded yet. Loading fallback...');
-    loadChartJSFallback().then(() => renderAnalytics());
+    if (window.__chartjsFailed) {
+      // All CDNs failed — render text-only version
+      console.warn('Chart.js unavailable, rendering text-only analytics');
+      renderAnalyticsTextOnly(c);
+      return;
+    }
+    // Still loading — retry after delay
+    setTimeout(() => renderAnalytics(), 500);
     return;
   }
 
@@ -2881,22 +3046,120 @@ function renderAnalytics() {
   try { renderPerformance(c); } catch(e) { console.error('Performance error:', e); }
 }
 
-function loadChartJSFallback() {
-  return new Promise((resolve, reject) => {
-    if (typeof Chart !== 'undefined') { resolve(); return; }
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
-    script.onload = () => resolve();
-    script.onerror = () => {
-      // Try alternative CDN
-      const alt = document.createElement('script');
-      alt.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-      alt.onload = () => resolve();
-      alt.onerror = reject;
-      document.head.appendChild(alt);
-    };
-    document.head.appendChild(script);
-  });
+function renderAnalyticsTextOnly(c) {
+  // Fallback when Chart.js is blocked by browser — render all except charts
+  try { renderHealthDashboard(c); } catch(e) { console.error(e); }
+
+  // Text-only leaderboard (no chart)
+  try {
+    const canvas = document.getElementById('leaderboardChart');
+    if (canvas) {
+      const parent = canvas.parentElement;
+      parent.innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 rounded p-2">⚠ Chart.js bị browser block (Tracking Prevention). Xem dữ liệu bên dưới.</div>';
+    }
+    renderLeaderboardTable(c);
+  } catch(e) { console.error(e); }
+
+  try { renderDuplicates(c); } catch(e) { console.error(e); }
+  try { renderDiversityPicker(c); } catch(e) { console.error(e); }
+
+  // Text-only diversity (no radar)
+  try {
+    const canvas = document.getElementById('diversityRadar');
+    if (canvas) {
+      const parent = canvas.parentElement;
+      parent.innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 rounded p-2 mb-2">⚠ Radar chart unavailable. Xem panel bên phải để thấy coverage.</div>';
+    }
+    renderDiversityTextOnly();
+  } catch(e) { console.error(e); }
+
+  try { renderKeywordAlignment(c); } catch(e) { console.error(e); }
+  try { renderPerformance(c); } catch(e) { console.error(e); }
+}
+
+function renderLeaderboardTable(c) {
+  // Just the table part, no chart
+  const rows = c.adGroups.map(ag => {
+    const as = calcAdStrengthFor(ag);
+    const div = calcDiversity(ag);
+    const perf = PERF_DATA[ag.name];
+    const combinedScore = perf ? Math.round(as.score * 0.5 + div.score * 0.3 + Math.min((perf.ctr || 0) * 10, 100) * 0.2) : Math.round(as.score * 0.7 + div.score * 0.3);
+    const pros = [], cons = [];
+    if (as.score >= 70) pros.push('AS cao');
+    if (ag.headlines.length >= 13) pros.push(`${ag.headlines.length}H đầy đủ`);
+    if (div.covered >= 8) pros.push(`${div.covered}/14 angles`);
+    if (as.score < 50) cons.push('AS thấp');
+    if (ag.headlines.length < 8) cons.push(`Thiếu H (${ag.headlines.length}/8)`);
+    if (div.covered < 5) cons.push(`Chỉ ${div.covered} angles`);
+    return { ag, score: combinedScore, as, div, pros, cons, perf };
+  }).sort((a,b) => b.score - a.score);
+
+  document.getElementById('lbCount').textContent = `${rows.length} groups`;
+  const tbody = document.getElementById('leaderboardBody');
+  if (!tbody) return;
+  tbody.innerHTML = rows.map((r, rank) => {
+    const rankBadge = rank === 0 ? '<span class="text-amber-500">🏆</span>' : `<span class="text-gray-400">${rank+1}</span>`;
+    const scoreColor = r.score >= 70 ? 'text-green-600' : r.score >= 40 ? 'text-amber-600' : 'text-red-600';
+    const flag = r.score < 40 ? '<span class="chip chip-err ml-1">Weak</span>' : r.score >= 80 ? '<span class="chip chip-ok ml-1">Top</span>' : '';
+    return `
+      <tr class="border-b border-gray-100 hover:bg-gray-50">
+        <td class="py-2.5 pr-2 font-mono text-xs">${rankBadge}</td>
+        <td class="py-2.5 pr-2 font-medium">${escapeHTML(r.ag.name)}${flag}</td>
+        <td class="py-2.5 pr-2"><span class="font-bold ${scoreColor}">${r.score}</span></td>
+        <td class="py-2.5 pr-2 text-xs text-gray-500">${r.ag.headlines.length}/${r.ag.descriptions.length}</td>
+        <td class="py-2.5 pr-2 text-xs">${r.pros.length ? r.pros.slice(0,3).map(p=>`<span class="chip chip-ok mr-1">${p}</span>`).join('') : '<span class="text-gray-400">—</span>'}</td>
+        <td class="py-2.5 pr-2 text-xs">${r.cons.length ? r.cons.slice(0,3).map(p=>`<span class="chip chip-warn mr-1">${p}</span>`).join('') : '<span class="text-gray-400">—</span>'}</td>
+        <td class="py-2.5 text-right"><button onclick="loadAdGroup('${r.ag.id}'); switchView('creative')" class="text-xs text-blue-600 hover:underline">Open →</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderDiversityTextOnly() {
+  const c = activeCampaign();
+  if (!c) return;
+  const agId = document.getElementById('divAgSelect').value || STATE.activeAdGroupId;
+  const ag = c.adGroups.find(x=>x.id === agId) || c.adGroups[0];
+  if (!ag) return;
+  const div = calcDiversity(ag);
+  const kwList = (ag.keywords||'').split('\n').map(k=>k.trim()).filter(Boolean);
+
+  // Skip radar, just render classification + suggestions
+  const validH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
+  const cel = document.getElementById('headlineClassification');
+  if (validH.length === 0) {
+    cel.innerHTML = '<div class="text-xs text-gray-400 italic">Chưa có headlines hợp lệ</div>';
+  } else {
+    cel.innerHTML = validH.map((h,i)=>{
+      const angles = classifyHeadline(h.text, kwList);
+      return `
+        <div class="border border-gray-100 rounded-md p-1.5 text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="text-gray-400 font-mono text-[10px] w-4">${i+1}</span>
+            <span class="flex-1 min-w-0 truncate">${escapeHTML(h.text)}</span>
+          </div>
+          <div class="flex flex-wrap gap-0.5 mt-0.5 pl-5">
+            ${angles.map(a => {
+              if (a === 'other') return '<span class="chip chip-warn">Other</span>';
+              const ang = ANGLES.find(x=>x.key===a);
+              return `<span class="chip chip-info">${ang.label}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const suggs = [];
+  const missing = ANGLES.filter(a => !div.coverage[a.key] || div.coverage[a.key] === 0).slice(0,4);
+  if (missing.length > 0) suggs.push({ type:'warn', text:`Thiếu: ${missing.map(m=>m.label).join(', ')}` });
+  if (div.maxPct > 40) suggs.push({ type:'warn', text:`${div.maxPct}% dồn 1 angle` });
+  if (div.covered >= 10) suggs.push({ type:'ok', text:`Cover ${div.covered}/14 angles — xuất sắc` });
+  if (suggs.length === 0) suggs.push({ type:'ok', text:'Diversity tốt' });
+  document.getElementById('divSuggestions').innerHTML = suggs.map(s=>{
+    const cls = s.type==='warn'?'text-amber-700 bg-amber-50':'text-green-700 bg-green-50';
+    return `<div class="${cls} px-2 py-1 rounded text-xs">${s.text}</div>`;
+  }).join('');
 }
 
 function renderHealthDashboard(c) {

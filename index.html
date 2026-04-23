@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSA Builder Pro v4 — Google Ads Creative Suite + Quick Copy</title>
+<title>RSA Builder Pro v4.1 — Fixed models + smart error handling</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -813,11 +813,30 @@ tailwind.config = {
       <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Model</label>
         <select id="modelSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-          <option value="deepseek/deepseek-chat-v3.1:free">DeepSeek v3.1 (Free)</option>
-          <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
-          <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
-          <option value="deepseek/deepseek-r1">DeepSeek R1</option>
+          <optgroup label="🎯 Đề xuất (free, auto-route)">
+            <option value="openrouter/free">OpenRouter Free (auto-route model khả dụng)</option>
+          </optgroup>
+          <optgroup label="🆓 DeepSeek Free">
+            <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3 0324 (Free)</option>
+            <option value="deepseek/deepseek-r1-0528:free">DeepSeek R1 0528 (Free, reasoning)</option>
+            <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+          </optgroup>
+          <optgroup label="💰 DeepSeek Paid (chất lượng cao hơn)">
+            <option value="deepseek/deepseek-chat">DeepSeek V3 Chat</option>
+            <option value="deepseek/deepseek-r1">DeepSeek R1 (reasoning)</option>
+            <option value="deepseek/deepseek-v3.2-exp">DeepSeek V3.2 Exp (mới nhất)</option>
+          </optgroup>
+          <optgroup label="🌐 Alternative free models">
+            <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (Free)</option>
+            <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B (Free)</option>
+            <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash Exp (Free)</option>
+          </optgroup>
+          <optgroup label="✏️ Custom">
+            <option value="__custom__">Nhập model ID riêng...</option>
+          </optgroup>
         </select>
+        <input type="text" id="modelCustom" class="hidden w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono" placeholder="VD: anthropic/claude-3.5-sonnet">
+        <div class="text-[10px] text-gray-500 mt-1">Model free có thể bị rate limit hoặc offline. <a href="https://openrouter.ai/models?q=free" target="_blank" class="text-blue-600 underline">Xem list hiện tại</a></div>
       </div>
       <div class="pt-3 border-t border-gray-100">
         <button onclick="clearAllData()" class="text-xs text-red-600 hover:underline">🗑 Xóa toàn bộ data (campaigns, settings)</button>
@@ -874,7 +893,7 @@ const STATE = {
   campaigns: [],
   settings: {
     apiKey: '',
-    model: 'deepseek/deepseek-chat-v3.1:free'
+    model: 'openrouter/free'
   }
 };
 
@@ -1215,16 +1234,43 @@ function loadSettings() {
 }
 function openSettings() {
   document.getElementById('apiKeyInput').value = STATE.settings.apiKey || '';
-  document.getElementById('modelSelect').value = STATE.settings.model || 'deepseek/deepseek-chat-v3.1:free';
+  const modelEl = document.getElementById('modelSelect');
+  const customEl = document.getElementById('modelCustom');
+  const currentModel = STATE.settings.model || 'openrouter/free';
+
+  // Check if model is in dropdown, else use custom
+  const hasOption = [...modelEl.options].some(o => o.value === currentModel);
+  if (hasOption) {
+    modelEl.value = currentModel;
+    customEl.classList.add('hidden');
+  } else {
+    modelEl.value = '__custom__';
+    customEl.classList.remove('hidden');
+    customEl.value = currentModel;
+  }
+
+  // Toggle custom input on change
+  modelEl.onchange = () => {
+    if (modelEl.value === '__custom__') customEl.classList.remove('hidden');
+    else customEl.classList.add('hidden');
+  };
+
   document.getElementById('settingsModal').classList.remove('hidden');
 }
 function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
 function saveSettings() {
   STATE.settings.apiKey = document.getElementById('apiKeyInput').value.trim();
-  STATE.settings.model = document.getElementById('modelSelect').value;
+  const modelVal = document.getElementById('modelSelect').value;
+  if (modelVal === '__custom__') {
+    const custom = document.getElementById('modelCustom').value.trim();
+    if (!custom) { toast('⚠ Nhập model ID'); return; }
+    STATE.settings.model = custom;
+  } else {
+    STATE.settings.model = modelVal;
+  }
   localStorage.setItem('rsa2_settings', JSON.stringify(STATE.settings));
   closeSettings();
-  toast('✓ Settings saved');
+  toast('✓ Settings saved · Model: ' + STATE.settings.model);
 }
 function clearAllData() {
   if (!confirm('Xóa TOÀN BỘ campaigns, ad groups, settings? Không thể undo.')) return;
@@ -2323,8 +2369,32 @@ async function callAI(prompt) {
     })
   });
   if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error(`API ${resp.status}: ${err.slice(0,200)}`);
+    const errText = await resp.text();
+    let msg = `API ${resp.status}`;
+    // Parse common errors
+    try {
+      const errJson = JSON.parse(errText);
+      if (errJson.error?.message) {
+        msg += ': ' + errJson.error.message.slice(0, 150);
+        // Specific: model not found
+        if (errJson.error.message.includes('No endpoints found') || errJson.error.code === 404) {
+          msg = `✗ Model "${STATE.settings.model}" không tồn tại hoặc offline.\n→ Mở Settings, đổi sang "OpenRouter Free" (auto-route).`;
+          setTimeout(() => openSettings(), 500);
+        }
+        // Rate limit
+        else if (resp.status === 429) {
+          msg = `⏱ Rate limit. Thử lại sau 30s hoặc chọn model khác.`;
+        }
+        // Auth
+        else if (resp.status === 401) {
+          msg = `🔑 API key không hợp lệ. Kiểm tra lại trong Settings.`;
+          setTimeout(() => openSettings(), 500);
+        }
+      }
+    } catch(e) {
+      msg += ': ' + errText.slice(0, 150);
+    }
+    throw new Error(msg);
   }
   const data = await resp.json();
   return data.choices?.[0]?.message?.content || '';

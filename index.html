@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSA Builder Pro v4.1 — Fixed models + smart error handling</title>
+<title>RSA Builder Pro v5 — Robust AI gen + error-safe analytics</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -20,7 +20,7 @@ tailwind.config = {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';"></script>
 <style>
   * { -webkit-font-smoothing: antialiased; }
   body { font-family: 'Inter', sans-serif; }
@@ -1548,14 +1548,14 @@ function switchView(v) {
 function addHeadline() {
   const ag = activeAdGroup();
   if (!ag) return;
-  if (ag.headlines.length >= 15) { toast('Đã tối đa 15 headlines'); return; }
+  if (ag.headlines.length >= 15) { toast('⚠ Google Ads giới hạn tối đa 15 headlines/RSA'); return; }
   ag.headlines.push({ text:'', pinned:null });
   saveData(); renderHeadlines(); renderStrength();
 }
 function addDescription() {
   const ag = activeAdGroup();
   if (!ag) return;
-  if (ag.descriptions.length >= 4) { toast('Đã tối đa 4 descriptions'); return; }
+  if (ag.descriptions.length >= 4) { toast('⚠ Google Ads giới hạn tối đa 4 descriptions/RSA'); return; }
   ag.descriptions.push({ text:'', pinned:null });
   saveData(); renderDescriptions(); renderStrength();
 }
@@ -2152,12 +2152,32 @@ function setPreviewDevice(d) {
 function renderPreview() {
   const ag = activeAdGroup(), c = activeCampaign();
   const container = document.getElementById('previewContainer');
-  if (!c || !ag) { container.innerHTML = '<div class="card p-8 text-center text-sm text-gray-400">Chọn ad group để xem preview</div>'; return; }
+  if (!container) return;
+
+  if (!c) {
+    container.innerHTML = '<div class="card p-12 text-center"><div class="text-4xl mb-3">📭</div><div class="text-sm font-medium text-gray-900 mb-1">Chưa có campaign</div><div class="text-xs text-gray-500">Tạo campaign mới từ sidebar để bắt đầu</div></div>';
+    return;
+  }
+  if (!ag) {
+    container.innerHTML = '<div class="card p-12 text-center"><div class="text-4xl mb-3">📭</div><div class="text-sm font-medium text-gray-900 mb-1">Chưa có ad group</div><div class="text-xs text-gray-500">Chọn ad group từ sidebar hoặc tạo mới</div></div>';
+    return;
+  }
 
   const vH = ag.headlines.filter(h=>h.text.trim() && h.text.length<=30);
   const vD = ag.descriptions.filter(d=>d.text.trim() && d.text.length<=90);
+
   if (vH.length < 3 || vD.length < 1) {
-    container.innerHTML = '<div class="card p-8 text-center text-sm text-gray-400">Cần tối thiểu 3 headlines + 1 description</div>';
+    const missing = [];
+    if (vH.length < 3) missing.push(`<strong>${3 - vH.length}</strong> headlines nữa (hiện có ${vH.length})`);
+    if (vD.length < 1) missing.push(`<strong>${1 - vD.length}</strong> description`);
+    container.innerHTML = `
+      <div class="card p-12 text-center">
+        <div class="text-4xl mb-3">👁‍🗨</div>
+        <div class="text-sm font-medium text-gray-900 mb-2">Cần thêm dữ liệu để preview</div>
+        <div class="text-xs text-gray-600 mb-4">Thiếu: ${missing.join(', ')}</div>
+        <button onclick="switchView('creative')" class="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Quay về Creative tab →</button>
+      </div>
+    `;
     return;
   }
 
@@ -2215,7 +2235,7 @@ function renderPreview() {
       </div>
 
       <div class="mt-4 text-xs text-gray-500 text-center">
-        Preview này dùng random combo của headlines/descriptions. Google có thể hiển thị khác tùy traffic.
+        Preview dùng random combo. Google có thể hiển thị khác tùy traffic. Click <strong>Shuffle</strong> để đổi combo.
       </div>
     </div>
   `;
@@ -2236,18 +2256,110 @@ async function generateCreative() {
     const prompt = buildCreativePrompt(ag);
     const resp = await callAI(prompt);
     const parsed = parseJSONResponse(resp);
-    if (!parsed) throw new Error('Không parse được AI response');
-    ag.headlines = parsed.headlines.slice(0,15).map(t=>({text:t,pinned:null}));
-    ag.descriptions = parsed.descriptions.slice(0,4).map(t=>({text:t,pinned:null}));
+
+    if (!parsed) {
+      throw new Error('Không parse được AI response. Thử model khác trong Settings.');
+    }
+
+    let hCount = 0, dCount = 0;
+
+    // Parse headlines (even if partial)
+    if (Array.isArray(parsed.headlines) && parsed.headlines.length > 0) {
+      const validH = parsed.headlines
+        .filter(h => typeof h === 'string' && h.trim())
+        .map(h => h.trim())
+        .slice(0, 15);
+      ag.headlines = validH.map(t => ({ text: t, pinned: null }));
+      hCount = validH.length;
+    }
+
+    // Parse descriptions
+    if (Array.isArray(parsed.descriptions) && parsed.descriptions.length > 0) {
+      const validD = parsed.descriptions
+        .filter(d => typeof d === 'string' && d.trim())
+        .map(d => d.trim())
+        .slice(0, 4);
+      ag.descriptions = validD.map(t => ({ text: t, pinned: null }));
+      dCount = validD.length;
+    }
+
     saveData();
     renderHeadlines(); renderDescriptions(); renderStrength(); renderAdGroupTabs(); renderSidebar();
-    toast(`✓ ${ag.headlines.length}H + ${ag.descriptions.length}D generated`);
+
+    // If descriptions missing, retry separately
+    if (hCount > 0 && dCount < 2) {
+      toast(`⚠ ${hCount}H tạo xong, thiếu descriptions — đang retry...`);
+      await sleep(500);
+      const retried = await retryDescriptionsOnly(ag);
+      if (retried) {
+        saveData();
+        renderDescriptions(); renderStrength();
+        toast(`✓ Retry xong: ${ag.descriptions.length} descriptions`);
+      } else {
+        toast(`⚠ Chỉ gen được ${hCount}H, 0D — thử click AI Gen lại`);
+      }
+    } else if (hCount === 0 && dCount === 0) {
+      toast('✗ AI không trả về headlines/descriptions. Thử model khác.');
+    } else {
+      toast(`✓ ${hCount}H + ${dCount}D generated`);
+    }
   } catch(e) {
-    console.error(e); toast('✗ ' + e.message);
+    console.error(e);
+    toast('✗ ' + e.message);
   } finally {
-    btn.disabled = false; btn.innerHTML = '✨ AI Gen';
+    btn.disabled = false;
+    btn.innerHTML = '✨ AI Gen';
   }
 }
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function retryDescriptionsOnly(ag) {
+  const langInstruction = ag.lang === 'vietnamese' ? 'Viết bằng tiếng Việt có dấu.' : 'Write in English.';
+  const prompt = `Generate EXACTLY 4 Google Ads descriptions for this product.
+Product: ${ag.theme}
+USP: ${ag.usp}
+Keywords: ${ag.keywords || 'none'}
+Offer: ${ag.offer || 'none'}
+${langInstruction}
+
+RULES: Each description MAX 90 characters. Include CTA. Benefit-focused. No duplicates.
+
+OUTPUT: Only JSON array, no other text:
+["description 1", "description 2", "description 3", "description 4"]`;
+
+  try {
+    const resp = await callAI(prompt);
+    // Try parse as array first
+    let cleaned = resp.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+    const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+    if (arrMatch) {
+      try {
+        const arr = JSON.parse(arrMatch[0]);
+        if (Array.isArray(arr) && arr.length > 0) {
+          ag.descriptions = arr
+            .filter(d => typeof d === 'string' && d.trim())
+            .slice(0, 4)
+            .map(t => ({ text: t.trim(), pinned: null }));
+          return true;
+        }
+      } catch(e) {}
+    }
+    // Fallback: parse as object with .descriptions
+    const obj = parseJSONResponse(resp);
+    if (obj && Array.isArray(obj.descriptions) && obj.descriptions.length > 0) {
+      ag.descriptions = obj.descriptions
+        .filter(d => typeof d === 'string' && d.trim())
+        .slice(0, 4)
+        .map(t => ({ text: t.trim(), pinned: null }));
+      return true;
+    }
+  } catch(e) {
+    console.error('Retry descriptions failed:', e);
+  }
+  return false;
+}
+
 async function regenerateOne() { generateCreative(); }
 
 async function generateExtensions() {
@@ -2752,13 +2864,39 @@ function renderAnalytics() {
     return;
   }
 
-  renderHealthDashboard(c);
-  renderLeaderboard(c);
-  renderDuplicates(c);
-  renderDiversityPicker(c);
-  renderDiversity();
-  renderKeywordAlignment(c);
-  renderPerformance(c);
+  // Check Chart.js loaded
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js not loaded yet. Loading fallback...');
+    loadChartJSFallback().then(() => renderAnalytics());
+    return;
+  }
+
+  // Wrap each render in try-catch so one error doesn't break all
+  try { renderHealthDashboard(c); } catch(e) { console.error('Health dashboard error:', e); }
+  try { renderLeaderboard(c); } catch(e) { console.error('Leaderboard error:', e); }
+  try { renderDuplicates(c); } catch(e) { console.error('Duplicates error:', e); }
+  try { renderDiversityPicker(c); } catch(e) { console.error('Diversity picker error:', e); }
+  try { renderDiversity(); } catch(e) { console.error('Diversity error:', e); }
+  try { renderKeywordAlignment(c); } catch(e) { console.error('KW alignment error:', e); }
+  try { renderPerformance(c); } catch(e) { console.error('Performance error:', e); }
+}
+
+function loadChartJSFallback() {
+  return new Promise((resolve, reject) => {
+    if (typeof Chart !== 'undefined') { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => {
+      // Try alternative CDN
+      const alt = document.createElement('script');
+      alt.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+      alt.onload = () => resolve();
+      alt.onerror = reject;
+      document.head.appendChild(alt);
+    };
+    document.head.appendChild(script);
+  });
 }
 
 function renderHealthDashboard(c) {
